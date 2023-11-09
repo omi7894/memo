@@ -7,7 +7,8 @@
 <version> : 프로젝트의 버전
 <packaging> : 패키지 타입설정 (war, jar)
 
-프로젝트 의존설정
+	
+[프로젝트 의존설정]
 <dependencies> : 라이브러리 의존성 정보를 가지고 있는 dependency 태그를 묶은 태그
 <dependency> : 각 라이브러리의 정보를 담는 태그
 <groupId> : 의존성 라이브러리의 group ID
@@ -16,7 +17,8 @@
 <scope> : 해당 라이브러리의 이용 범위를 지정
 <optional> : 다른 프로젝트에서 이프로젝트를 의존성 설정을 할 경우 사용할지 결정
 
-scope 태그
+	
+[scope 태그]
 	- compile (default)
 		○ 모든 클래스 경로에서 사용할 수 있음
 		○ 컴파일 및 배포 상황에서 같이 제공됨
