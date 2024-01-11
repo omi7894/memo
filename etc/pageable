@@ -24,3 +24,24 @@ public class ProceedDocumentBoxQueryServiceImpl implements ProceedDocumentBoxQue
         return proceedDocumentBoxRepository.findProceedDocumentBox(inDto.getCompanyCode(), inDto.getUserId(), pageable);
     }
 }
+
+
+@Service
+@Slf4j
+@RequiredArgsConstructor
+public class ProceedDocumentBoxQueryServiceImpl implements ProceedDocumentBoxQueryService {
+
+    private final ProceedDocumentBoxRepository proceedDocumentBoxRepository;
+
+    @Override
+    public List<ProceedDocumentBoxQueryOutDto> findProceedDocumentBox(ProceedDocumentQueryInDto inDto) {
+        // 예를 들어, sort, page, size를 inDto에서 가져온다고 가정
+        String sort = inDto.getSort();
+        Integer page = inDto.getPage();
+        Integer size = inDto.getSize();
+
+        Pageable pageable = PageRequest.of(page, size); // PageRequest를 사용하여 Pageable 객체 생성
+
+        return proceedDocumentBoxRepository.findProceedDocumentBox(inDto.getCompanyCode(), inDto.getUserId(), pageable);
+    }
+}
