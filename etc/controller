@@ -1,0 +1,7 @@
+@GetMapping(value="/document-box-count2")
+    @Operation(summary = "문서함 카운트 조회2", tags = "결재함 공통")
+    public ResponseDto<Map<String, Integer>> findPersonalDocumentBoxCount2(@Valid PersonInfoQueryInDto personInfoQueryInDto){
+        List<DocumentBoxCountQueryOutDto> documentBoxCountQueryOutDtoList = documentBoxCountQueryService.findPersonalDocumentBoxCount(personInfoQueryInDto);
+        Map<String, Integer> result = new HashMap<>();
+        return ResponseDto.success(result);
+    }
