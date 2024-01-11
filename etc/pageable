@@ -45,3 +45,30 @@ public class ProceedDocumentBoxQueryServiceImpl implements ProceedDocumentBoxQue
         return proceedDocumentBoxRepository.findProceedDocumentBox(inDto.getCompanyCode(), inDto.getUserId(), pageable);
     }
 }
+
+
+
+@Override
+    public List<ProceedDocumentBoxQueryOutDto> findProceedDocumentBox(ProceedDocumentQueryInDto inDto) {
+        // 예를 들어, sort, page, size를 inDto에서 가져온다고 가정
+        String sort = inDto.getSort();
+        Integer page = inDto.getPage();
+        Integer size = inDto.getSize();
+
+        Pageable pageable;
+
+        if (sort != null && !sort.isEmpty()) {
+            String[] sortArr = sort.split(",");
+            Sort.Direction direction = Sort.Direction.ASC;
+            if (sortArr.length > 1 && "desc".equalsIgnoreCase(sortArr[1])) {
+                direction = Sort.Direction.DESC;
+            }
+
+            pageable = PageRequest.of(page, size, direction, sortArr[0]);
+        } else {
+            pageable = PageRequest.of(page, size);
+        }
+
+        return proceedDocumentBoxRepository.findProceedDocumentBox(inDto.getCompanyCode(), inDto.getUserId(), pageable);
+    }
+
