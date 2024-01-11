@@ -125,3 +125,45 @@ public class ProceedDocumentBoxRepositoryImpl implements ProceedDocumentBoxRepos
 
 }
 
+
+
+
+
+
+@Repository
+@RequiredArgsConstructor
+@Slf4j
+public class ProceedDocumentBoxRepositoryImpl implements ProceedDocumentBoxRepository {
+    private final DSLContext dsl;
+
+    @Override
+    public List<ProceedDocumentBoxQueryOutDto> findProceedDocumentBox(String companyCode, String userId, Pageable pageable) {
+        SelectLimitStep<?> select = dsl
+                .select(PROCEED_DOCUMENT_BOX.USER_ID,
+                        PROCEED_DOCUMENT_BOX.COMPANY_CODE,
+                        DOCUMENT_STATUS.DOCUMENT_TITLE,
+                        DOCUMENT_STATUS.DOCUMENT_ID,
+                        DOCUMENT_STATUS.APPROVAL_LINE_ID,
+                        DOCUMENT_STATUS.PARENT_APPROVAL_LINE_ID,
+                        DOCUMENT_STATUS.DOCUMENT_STATUS_CODE,
+                        DOCUMENT_STATUS.FORM_CODE,
+                        DOCUMENT_STATUS.FORM_NAME,
+                        DOCUMENT_STATUS.FORM_NAME_EN,
+                        DOCUMENT_STATUS.CURRENT_APPROVER_ID,
+                        DOCUMENT_STATUS.CURRENT_APPROVER_NAME,
+                        DOCUMENT_STATUS.CURRENT_APPROVER_NAME_EN,
+                        DOCUMENT_STATUS.SUBMIT_DATETIME,
+                        DOCUMENT_STATUS.APPROVAL_LINE_CURRENT_NO,
+                        DOCUMENT_STATUS.APPROVAL_LINE_TOTAL_NO)
+                .from(DOCUMENT_STATUS)
+                .join(PROCEED_DOCUMENT_BOX).on(DOCUMENT_STATUS.DOCUMENT_STATUS_ID.eq(PROCEED_DOCUMENT_BOX.DOCUMENT_STATUS_ID))
+                .where(PROCEED_DOCUMENT_BOX.USER_ID.eq(userId))
+                .and(PROCEED_DOCUMENT_BOX.COMPANY_CODE.eq(companyCode))
+                .and(PROCEED_DOCUMENT_BOX.DISPLAY_YN.eq("Y"))
+                .limit(pageable.getPageSize())
+                .offset((int) pageable.getOffset());
+
+        return select.fetchInto(ProceedDocumentBoxQueryOutDto.class);
+    }
+}
+
