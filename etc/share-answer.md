@@ -36,6 +36,12 @@ approvalShareReaderRepository.findByApprovalShareAndUserIdInAndUseYn(approvalSha
     .ifPresent(existingReader -> {
         throw new DuplicateReaderException("사용자 중 일부가 이미 결재 공유 열람자로 등록되어 있습니다");
     });
+
+createCommandInDto.getApprovalShareReaderList().forEach(readerDto -> {
+    if (approvalShareReaderRepository.findByApprovalShareAndUserIdAndUseYn(approvalShare, readerDto.getUserId(), YesNo.Y).orElse(null) != null) {
+        throw new DuplicateReaderException("사용자 ID " + readerDto.getUserId() + "로 이미 존재하는 결재 공유 열람자가 있습니다");
+    }
+});
 ```
 ---> approvalShareReaderRepository.findByApprovalShareAndUserIdAndUseYn는 데이터베이스에서 결재 공유와 사용 중인 열람자를 조회하는 가상의 메서드입니다. 
 
