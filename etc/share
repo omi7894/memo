@@ -1,0 +1,28 @@
+@Override
+    public ApprovalShareCreateCommandOutDto createShareEntities(ApprovalShareCreateCommandInDto createCommandInDto) {
+        log.info("=====================================createShareEntities=====================================");
+        // 결재선 실제로 존재하는 지 확인
+        ApprovalLine approvalLine = approvalLineRepository.findOneToOneFetchByApprovalLineIdAndUseYn(createCommandInDto.getApprovalLineId(), YesNo.Y)
+                .orElseThrow(() -> new NotFoundException("ApprovalLine"));
+
+        //이미 존재하는 공유 열람자인지 확인
+
+
+        // 결재 공유 열람자 화면 생성
+        List<ApprovalShareReaderView> approvalShareReaderViewList = createApprovalShareReaderViewList(createCommandInDto.getApprovalShareReaderList());
+        List<String> approvalShareReaderViewIdList = approvalShareReaderViewList.stream().map(ApprovalShareReaderView::getApprovalShareReaderViewId).collect(Collectors.toList());
+
+        // 결재 공유 공유자 화면 생성
+        ApprovalShareSharerView approvalShareSharerView = createApprovalShareSharerView(createCommandInDto.getApprovalShareSharer());
+
+        // 결재 공유 생성
+        ApprovalShare approvalShare = createApprovalShare(createCommandInDto.getParentApprovalLineId(), approvalShareReaderViewList, approvalShareSharerView, approvalLine);
+
+        return ApprovalShareCreateCommandOutDto.builder()
+                .approvalShareId(approvalShare.getApprovalShareId())
+                .approvalShareSharerViewId(approvalShareSharerView.getApprovalShareSharerViewId())
+                .approvalShareReaderViewIdList(approvalShareReaderViewIdList)
+                .build();
+    }
+
+    이미 존재하는 공유 열람자인지 확인하는 로직 개발해줘
