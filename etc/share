@@ -14,3 +14,9 @@
             }
         }
 이미 존재하는 공유열람자인지 확인하는 부분 간단하게 바꿔줘
+
+createCommandInDto.getApprovalShareReaderList().forEach(readerDto -> {
+    if (approvalShareRepository.existsByApprovalLineIdAndReaderUserIdAndUseYn(createCommandInDto.getApprovalLineId(), readerDto.getReaderId(), YesNo.Y)) {
+        throw new DuplicateException(readerDto.getReaderId());
+    }
+});
