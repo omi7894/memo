@@ -26,3 +26,19 @@
     }
 
     이미 존재하는 공유 열람자인지 확인하는 로직 개발해줘
+
+
+
+
+
+
+//결재선 실제로 존재하는지 확인하는 쿼리
+
+@EntityGraph(attributePaths = {
+            "integratedApprovalLineInterfaceParameter",
+            "receive",
+            "sendList"
+    })
+    Optional<ApprovalLine> findOneToOneFetchByApprovalLineIdAndUseYn(String approvalLineId, YesNo yesNo);
+
+해석해줘
