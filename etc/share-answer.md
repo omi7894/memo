@@ -67,3 +67,27 @@ Optional<ApprovalLine>: 이 메서드는 ApprovalLine을 반환하며, 결과가
 findOneToOneFetchByApprovalLineIdAndUseYn(String approvalLineId, YesNo yesNo): 이 메서드는 approvalLineId와 yesNo를 파라미터로 받아 결재선을 조회하는 쿼리 메서드입니다. yesNo는 Yes 또는 No 값을 가지는 열거형(여기서는 YesNo)이며, 사용 여부를 나타냅니다.
 
 따라서, 이 메서드를 호출하면 ApprovalLine 엔터티와 연관된 integratedApprovalLineInterfaceParameter, receive, sendList 속성들이 함께 로딩되어 반환됩니다.
+
+
+### 공유열람자 중복을 조회하는 JPA
+```
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import java.util.List;
+
+public interface ApprovalShareRepository extends JpaRepository<ApprovalShare, String> {
+
+    @Query("SELECT a FROM ApprovalShare a " +
+            "JOIN ApprovalShareReaderView arv ON a.approvalShareId = arv.approvalShareId " +
+            "WHERE a.useYn = 'Y' AND arv.useYn = 'Y' " +
+            "AND a.approvalLineId = :approvalLineId AND arv.readerUserId = :readerUserId")
+    List<ApprovalShare> findActiveApprovalSharesByLineAndUser(
+            @Param("approvalLineId") String approvalLineId,
+            @Param("readerUserId") String readerUserId);
+}
+```
+```
+List<ApprovalShare> activeApprovalShares = approvalShareRepository.findActiveApprovalSharesByLineAndUser(approvalLineId, readerUserId);
+
+```
