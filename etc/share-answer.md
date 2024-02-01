@@ -1,5 +1,5 @@
 
-공람자 추가 - 이미 존재하는 열람자인지 확인
+### 공람자 추가 - 이미 존재하는 열람자인지 확인
 ```
 // 결재 공유 열람자 목록을 확인하여 이미 존재하는 열람자인지 확인
 for (ApprovalShareReaderDto readerDto : createCommandInDto.getApprovalShareReaderList()) {
