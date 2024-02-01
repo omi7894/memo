@@ -1,3 +1,4 @@
+```
 // 결재 공유 열람자 목록을 확인하여 이미 존재하는 열람자인지 확인
 for (ApprovalShareReaderDto readerDto : createCommandInDto.getApprovalShareReaderList()) {
     // 데이터베이스에서 해당 결재 공유와 사용 중인 상태인 열람자를 조회합니다.
@@ -27,5 +28,5 @@ return ApprovalShareCreateCommandOutDto.builder()
         .approvalShareReaderViewIdList(approvalShareReaderViewIdList)
         .build();
 
-
+```
 ---> approvalShareReaderRepository.findByApprovalShareAndUserIdAndUseYn는 데이터베이스에서 결재 공유와 사용 중인 열람자를 조회하는 가상의 메서드입니다. 
