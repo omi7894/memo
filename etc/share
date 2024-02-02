@@ -48,3 +48,11 @@ public ResponseDto<ApprovalShareReaderListQueryOutDto> findSharedUserList(Reader
     ApprovalShareReaderListQueryOutDto resultDto = new ApprovalShareReaderListQueryOutDto(list);
     return new ResponseDto<>(resultDto);
 }
+
+
+
+
+List<ApprovalShareReaderQueryOutDto> list = // some list;
+ApprovalShareReaderListQueryOutDto dto = ApprovalShareReaderListQueryOutDto.builder()
+        .readerList(list)
+        .build();
