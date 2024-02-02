@@ -81,3 +81,14 @@ CREATE TABLE "approval_share_reader_view" (
 둘다 USE_YN 이 'Y'인것중에
 where절에 APPROVAL_LINE_ID로 조건걸어서 
 approval_share_reader_view의 컬럼들을 결과로 보여줘
+
+
+
+public class ShareServiceImpl implements ShareService{
+    ApprovalShareReaderViewRepository approvalShareReaderViewRepository;
+    @Override
+    public List<ApprovalShareReaderListQueryOutDto> findSharedUserList(ReaderListQueryInDto queryInDto) {
+        List<ApprovalShareReaderView> list = approvalShareReaderViewRepository.findApprovalShareReaderViewByApprovalLineId(queryInDto.getApprovalLineId());
+        return null;
+    }
+}
