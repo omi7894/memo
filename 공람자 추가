@@ -1,0 +1,30 @@
+ApprovalShareRepository.java
+
+ @Query("select a from ApprovalShare a "
+            + "join ApprovalShareReaderView arv on a.approvalShareId = arv.approvalShare "
+            + "where a.useYn = 'Y' and arv.useYn = 'Y' "
+            + "and a.approvalLine = :approvalLineId and arv.readerUserId = :readerUserId")
+    Optional<ApprovalShare> findApprovalShareByApprovalLineIdAndReaderUserId(
+            @Param("approvalLineId") String approvalLineId,
+            @Param("readerUserId") String readerUserId);
+
+
+
+ShareCommandServiceImpl
+
+//이미 존재하는 공유 열람자인지 확인
+        /*for (ApprovalShareReaderCreateCommandInDto readerDto : createCommandInDto.getApprovalShareReaderList()) {
+            // 데이터베이스에서 해당 결재 공유와 사용 중인 상태인 열람자를 조회합니다.
+            Optional<ApprovalShare> existingReader = approvalShareRepository
+                    .findApprovalShareByApprovalLineIdAndReaderUserId(createCommandInDto.getApprovalLineId(), readerDto.getReaderId());
+
+            if (existingReader.isPresent()) {
+                // 이미 존재하는 열람자라면 예외를 던지거나, 상황에 따라 처리합니다.
+                throw new DuplicateException(readerDto.getReaderId());
+            }
+        }*/
+        createCommandInDto.getApprovalShareReaderList().forEach(readerDto -> {
+            if (approvalShareRepository.findApprovalShareByApprovalLineIdAndReaderUserId(createCommandInDto.getApprovalLineId(), readerDto.getReaderId()).isPresent()) {
+                throw new DuplicateException(readerDto.getReaderId());
+            }
+        });
