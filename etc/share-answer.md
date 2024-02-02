@@ -91,3 +91,22 @@ public interface ApprovalShareRepository extends JpaRepository<ApprovalShare, St
 List<ApprovalShare> activeApprovalShares = approvalShareRepository.findActiveApprovalSharesByLineAndUser(approvalLineId, readerUserId);
 
 ```
+
+### 공유열람자 조회
+```
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import java.util.List;
+
+public interface ApprovalShareReaderViewRepository extends JpaRepository<ApprovalShareReaderView, String> {
+
+    @Query("SELECT asrv FROM ApprovalShareReaderView asrv " +
+            "JOIN ApprovalShare asr ON asrv.approvalShareId = asr.approvalShareId " +
+            "WHERE asr.useYn = 'Y' AND asrv.useYn = 'Y' AND asr.approvalLineId = :approvalLineId")
+    List<ApprovalShareReaderView> findApprovalShareReaderViewsByApprovalLineId(@Param("approvalLineId") String approvalLineId);
+}
+```
+```
+List<ApprovalShareReaderView> result = approvalShareReaderViewRepository.findApprovalShareReaderViewsByApprovalLineId("your_approval_line_id");
+
+```
