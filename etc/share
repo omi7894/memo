@@ -1,25 +1,3 @@
-ApprovalShareReaderViewRepository approvalShareReaderViewRepository;
-    ApprovalShareReaderViewAggregate approvalShareReaderViewAggregate;
-    @Override
-    public List<ApprovalShareReaderListQueryOutDto> findSharedUserList(ReaderListQueryInDto queryInDto) {
-        List<ApprovalShareReaderView> list = approvalShareReaderViewRepository.findApprovalShareReaderViewByApprovalLineId(queryInDto.getApprovalLineId());
-
-        return null;
-    }
-
-list 있는 값들을 하나씩 꺼내서 
-approvalShareReaderViewAggregate.createApprovalShareReaderQueryOutDto 함수를 통해 dto로 바꿔주고
-그것들을 다시 list로 만들어서 반환해줘
-
-
-@Override
-    public List<ApprovalShareReaderListQueryOutDto> findSharedUserList(ReaderListQueryInDto queryInDto) {
-        List<ApprovalShareReaderView> list = approvalShareReaderViewRepository.findApprovalShareReaderViewsByApprovalLineId(queryInDto.getApprovalLineId());
-
-        return list.stream()
-                .map(approvalShareReaderViewAggregate::createApprovalShareReaderQueryOutDto)
-                .collect(Collectors.toList());
-    }
 
 
 @Getter
@@ -42,3 +20,31 @@ public class ApprovalShareReaderListQueryOutDto {
     }
 
 list를 ApprovalShareReaderListQueryOutDto 의 readerList에 담아서 반환해줘
+
+
+>>>
+
+
+@Getter
+@ToString
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Builder
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public class ApprovalShareReaderListQueryOutDto {
+    private List<ApprovalShareReaderQueryOutDto> readerList;
+
+    public ApprovalShareReaderListQueryOutDto(List<ApprovalShareReaderQueryOutDto> readerList) {
+        this.readerList = readerList;
+    }
+}
+
+
+@GetMapping(value = "/shared-user")
+@Operation(summary = "공람자 조회", tags = "결재공유")
+public ResponseDto<ApprovalShareReaderListQueryOutDto> findSharedUserList(ReaderListQueryInDto queryInDto) {
+    // 결재공유열람자 화면 select
+    List<ApprovalShareReaderQueryOutDto> list = shareService.findSharedUserList(queryInDto);
+
+    ApprovalShareReaderListQueryOutDto resultDto = new ApprovalShareReaderListQueryOutDto(list);
+    return new ResponseDto<>(resultDto);
+}
