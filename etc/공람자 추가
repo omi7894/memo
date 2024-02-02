@@ -1,6 +1,6 @@
 ## ApprovalShareRepository.java
 @Query("select a from ApprovalShare a "
-            + "join ApprovalShareReaderView arv on a.approvalShareId = arv.approvalShare "
+            + "join ApprovalShareReaderView arv on a.approvalShareId = arv.approvalShare.approvalShareId "
             + "where a.useYn = 'Y' and arv.useYn = 'Y' "
             + "and a.approvalLine.approvalLineId = :approvalLineId and arv.readerUserId = :readerUserId")
     List<ApprovalShare> findApprovalShareByApprovalLineIdAndReaderUserId(
