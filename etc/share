@@ -20,3 +20,25 @@ approvalShareReaderViewAggregate.createApprovalShareReaderQueryOutDto 함수를 
                 .map(approvalShareReaderViewAggregate::createApprovalShareReaderQueryOutDto)
                 .collect(Collectors.toList());
     }
+
+
+@Getter
+@ToString
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Builder // @Setter 제거하고 @Builder 어노테이션 적용
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public class ApprovalShareReaderListQueryOutDto {
+    private List<ApprovalShareReaderQueryOutDto> readerList;
+
+}
+
+
+@GetMapping(value = "/shared-user")
+    @Operation(summary = "공람자 조회", tags = "결재공유")
+    public ResponseDto<ApprovalShareReaderListQueryOutDto> findSharedUserList(ReaderListQueryInDto queryInDto){
+        // 결재공유열람자 화면 select
+        List<ApprovalShareReaderQueryOutDto> list = shareService.findSharedUserList(queryInDto);
+        return null;
+    }
+
+list를 ApprovalShareReaderListQueryOutDto 의 readerList에 담아서 반환해줘
