@@ -1,94 +1,12 @@
-// 결재선 실제로 존재하는 지 확인
-        ApprovalLine approvalLine = approvalLineRepository.findOneToOneFetchByApprovalLineIdAndUseYn(createCommandInDto.getApprovalLineId(), YesNo.Y)
-                .orElseThrow(() -> new NotFoundException("ApprovalLine"));
-
-        //이미 존재하는 공유 열람자인지 확인
-        for (ApprovalShareReaderCreateCommandInDto readerDto : createCommandInDto.getApprovalShareReaderList()) {
-            // 데이터베이스에서 해당 결재 공유와 사용 중인 상태인 열람자를 조회합니다.
-            Optional<ApprovalShare> existingReader = approvalShareRepository
-                    .findApprovalShareByApprovalLineIdAndReaderUserId(createCommandInDto.getApprovalLineId(), readerDto.getReaderId());
-
-            if (existingReader.isPresent()) {
-                // 이미 존재하는 열람자라면 예외를 던지거나, 상황에 따라 처리합니다.
-                throw new DuplicateException(readerDto.getReaderId());
-            }
-        }
-이미 존재하는 공유열람자인지 확인하는 부분 간단하게 바꿔줘
-
-createCommandInDto.getApprovalShareReaderList().forEach(readerDto -> {
-    if (approvalShareRepository.existsByApprovalLineIdAndReaderUserIdAndUseYn(createCommandInDto.getApprovalLineId(), readerDto.getReaderId(), YesNo.Y)) {
-        throw new DuplicateException(readerDto.getReaderId());
-    }
-});
-
-
-
-
-
-CREATE TABLE "approval_share" (
-  "APPROVAL_SHARE_ID" varchar(40) NOT NULL COMMENT '결재 공유 ID',
-  "APPROVAL_LINE_ID" varchar(40) NOT NULL COMMENT '결재 선 ID',
-  "PARENT_APPROVAL_LINE_ID" varchar(40) DEFAULT NULL COMMENT '부모 결재 선 ID',
-  "USE_YN" char(1) NOT NULL DEFAULT 'Y' COMMENT '사용 여부',
-  "CREATOR_ID" varchar(20) NOT NULL COMMENT '생성자 ID',
-  "CREATE_DATETIME" timestamp NOT NULL COMMENT '생성 일시',
-  "MODIFIER_ID" varchar(20) NOT NULL COMMENT '수정자 ID',
-  "MODIFY_DATETIME" timestamp NOT NULL COMMENT '수정 일시',
-  PRIMARY KEY ("APPROVAL_SHARE_ID")
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='결재 공유';
-
-CREATE TABLE "approval_share_reader_view" (
-  "APPROVAL_SHARE_READER_VIEW_ID" varchar(40) NOT NULL COMMENT '결재 공유 화면 ID',
-  "APPROVAL_SHARE_ID" varchar(40) NOT NULL COMMENT '결재 공유 ID',
-  "READER_ORDER_NO" int(11) NOT NULL COMMENT '열람자 순서 번호',
-  "READ_YN" char(1) NOT NULL DEFAULT 'N' COMMENT '열람 여부',
-  "SHARE_DATETIME" timestamp NULL DEFAULT NULL COMMENT '공유 일시',
-  "READ_DATETIME" timestamp NULL DEFAULT NULL COMMENT '열람 일시',
-  "APPROVAL_SHARE_TYPE_CODE" varchar(20) DEFAULT NULL COMMENT '공유 유형 코드',
-  "READER_TYPE_CODE" varchar(20) DEFAULT NULL COMMENT '열람자 유형 코드',
-  "READER_ID" varchar(20) DEFAULT NULL COMMENT '열람자 ID',
-  "READER_NAME" varchar(100) DEFAULT NULL COMMENT '열람자 이름',
-  "READER_NAME_EN" varchar(100) DEFAULT NULL COMMENT '열람자 이름 영문',
-  "READER_USER_ID" varchar(20) DEFAULT NULL COMMENT '열람자 사용자 ID',
-  "READER_USER_NAME" varchar(100) DEFAULT NULL COMMENT '열람자 사용자 이름',
-  "READER_USER_NAME_EN" varchar(100) DEFAULT NULL COMMENT '열람자 사용자 이름 영문',
-  "READER_DEPARTMENT_CODE" varchar(50) DEFAULT NULL COMMENT '열람자 부서 코드',
-  "READER_DEPARTMENT_NAME" varchar(200) DEFAULT NULL COMMENT '열람자 부서 이름',
-  "READER_DEPARTMENT_NAME_EN" varchar(200) DEFAULT NULL COMMENT '열람자 부서 이름 영문',
-  "READER_COMPANY_CODE" varchar(20) DEFAULT NULL COMMENT '열람자 회사 코드',
-  "READER_COMPANY_NAME" varchar(100) DEFAULT NULL COMMENT '열람자 회사 이름',
-  "READER_COMPANY_NAME_EN" varchar(100) DEFAULT NULL COMMENT '열람자 회사 이름 영문',
-  "READER_DUTY_CODE" varchar(20) DEFAULT NULL COMMENT '열람자 보직 코드',
-  "READER_DUTY_NAME" varchar(100) DEFAULT NULL COMMENT '열람자 보직 이름',
-  "READER_DUTY_NAME_EN" varchar(100) DEFAULT NULL COMMENT '열람자 보직 이름 영문',
-  "READER_JOB_POSITION_CODE" varchar(20) DEFAULT NULL COMMENT '열람자 직위 코드',
-  "READER_JOB_POSITION_NAME" varchar(100) DEFAULT NULL COMMENT '열람자 직위 이름',
-  "READER_JOB_POSITION_NAME_EN" varchar(100) DEFAULT NULL COMMENT '열람자 직위 이름 영문',
-  "READER_ROLE_CODE" varchar(20) DEFAULT NULL COMMENT '열람자 롤 코드',
-  "READER_ROLE_NAME" varchar(100) DEFAULT NULL COMMENT '열람자 롤 이름',
-  "READER_ROLE_NAME_EN" varchar(100) DEFAULT NULL COMMENT '열람자 롤 이름 영문',
-  "READ_PHASE_TYPE_CODE" varchar(20) NOT NULL DEFAULT 'NONE' COMMENT '열람 단계 유형 코드',
-  "DISPLAY_YN" char(1) NOT NULL DEFAULT 'Y' COMMENT '화면 표시 여부',
-  "USE_YN" char(1) NOT NULL DEFAULT 'Y' COMMENT '사용 여부',
-  "CREATOR_ID" varchar(20) NOT NULL COMMENT '생성자 ID',
-  "CREATE_DATETIME" timestamp NOT NULL COMMENT '생성 일시',
-  "MODIFIER_ID" varchar(20) NOT NULL COMMENT '수정자 ID',
-  "MODIFY_DATETIME" timestamp NOT NULL COMMENT '수정 일시',
-  PRIMARY KEY ("APPROVAL_SHARE_READER_VIEW_ID")
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='결재 공유 열람자 화면';
-
-두테이블을 APPROVAL_SHARE_ID로 조인하고
-둘다 USE_YN 이 'Y'인것중에
-where절에 APPROVAL_LINE_ID로 조건걸어서 
-approval_share_reader_view의 컬럼들을 결과로 보여줘
-
-
-
-public class ShareServiceImpl implements ShareService{
-    ApprovalShareReaderViewRepository approvalShareReaderViewRepository;
+ApprovalShareReaderViewRepository approvalShareReaderViewRepository;
+    ApprovalShareReaderViewAggregate approvalShareReaderViewAggregate;
     @Override
     public List<ApprovalShareReaderListQueryOutDto> findSharedUserList(ReaderListQueryInDto queryInDto) {
         List<ApprovalShareReaderView> list = approvalShareReaderViewRepository.findApprovalShareReaderViewByApprovalLineId(queryInDto.getApprovalLineId());
+
         return null;
     }
-}
+
+list 있는 값들을 하나씩 꺼내서 
+approvalShareReaderViewAggregate.createApprovalShareReaderQueryOutDto 함수를 통해 dto로 바꿔주고
+그것들을 다시 list로 만들어서 반환해줘
