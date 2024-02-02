@@ -10,3 +10,13 @@ ApprovalShareReaderViewRepository approvalShareReaderViewRepository;
 list 있는 값들을 하나씩 꺼내서 
 approvalShareReaderViewAggregate.createApprovalShareReaderQueryOutDto 함수를 통해 dto로 바꿔주고
 그것들을 다시 list로 만들어서 반환해줘
+
+
+@Override
+    public List<ApprovalShareReaderListQueryOutDto> findSharedUserList(ReaderListQueryInDto queryInDto) {
+        List<ApprovalShareReaderView> list = approvalShareReaderViewRepository.findApprovalShareReaderViewsByApprovalLineId(queryInDto.getApprovalLineId());
+
+        return list.stream()
+                .map(approvalShareReaderViewAggregate::createApprovalShareReaderQueryOutDto)
+                .collect(Collectors.toList());
+    }
