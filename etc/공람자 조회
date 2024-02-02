@@ -30,6 +30,6 @@ ApprovalShareReaderViewAggregate approvalShareReaderViewAggregate;
 
 ## ApprovalShareReaderViewRepository.java
 @Query("select asrv from ApprovalShareReaderView asrv " +
-            "join ApprovalShare asr on asrv.approvalShare = asr.approvalShareId " +
-            "where asr.useYn = 'Y' and asrv.useYn = 'Y' and asr.approvalLine = :approvalLineId")
+            "join ApprovalShare asr on asrv.approvalShare.approvalShareId = asr.approvalShareId " +
+            "where asr.useYn = 'Y' and asrv.useYn = 'Y' and asr.approvalLine.approvalLineId = :approvalLineId")
     List<ApprovalShareReaderView> findApprovalShareReaderViewByApprovalLineId(@Param("approvalLineId") String approvalLineId);
