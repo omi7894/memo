@@ -68,21 +68,15 @@ SUBMIT_DATETIME 으로 조건을 걸고 싶어. 특정 기간 사이의 값들�
 이때 where절 파라미터를 어떤형식으로 넘겨줘야할까?
 
 >>
-    @Query("SELECT ds FROM DocumentStatus ds WHERE ds.submitDatetime BETWEEN :startDate AND :endDate")
-    List<DocumentStatus> findBySubmitDatetimeBetween(
+@Query("SELECT COUNT(pdb) FROM ProceedDocumentBox pdb " +
+            "JOIN pdb.documentStatus ds " +
+            "WHERE pdb.companyCode = :companyCode " +
+            "AND (:userId IS NULL OR pdb.userId = :userId) " +
+            "AND pdb.displayYn = 'Y' " +
+            "AND ds.displayYn = 'Y' " +
+            "AND ds.submitDatetime BETWEEN :startDate AND :endDate")
+    Integer customCountQuery(
+            @Param("companyCode") String companyCode,
+            @Param("userId") String userId,
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate);
-}
-
- @Query("SELECT pdb FROM ProceedDocumentBox pdb " +
-            "JOIN pdb.documentStatus ds " +
-            "WHERE pdb.userId = :userId " +
-            "AND pdb.companyCode = :companyCode " +
-            "AND pdb.displayYn = :displayYn " +
-            "AND ds.displayYn = :documentStatusDisplayYn")
-    List<ProceedDocumentBox> findByUserIdAndCompanyCodeAndDisplayYnAndDocumentStatusDisplayYn(
-            @Param("userId") String userId,
-            @Param("companyCode") String companyCode,
-            @Param("displayYn") String displayYn,
-            @Param("documentStatusDisplayYn") String documentStatusDisplayYn);
-}
