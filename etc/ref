@@ -101,3 +101,14 @@ public interface ApprovalShareReaderViewRepository extends JpaRepository<Approva
 }
 
 여기 안에다가 소스를 짜줘
+
+>>>
+
+ @Query("SELECT asrv FROM ApprovalShareReaderView asrv " +
+            "JOIN ApprovalShare asr ON asrv.approvalShare.approvalShareId = asr.approvalShareId " +
+            "JOIN ApprovalLine al ON asr.approvalLine.approvalLineId = al.approvalLineId " +
+            "WHERE asr.useYn = 'Y' AND asrv.useYn = 'Y' AND al.approvalLineId = :approvalLineId " +
+            "AND al.useYn = 'Y' AND asrv.displayYn = :displayYn")
+    List<ApprovalShareReaderView> findApprovalShareReaderViewByApprovalLineId(
+            @Param("approvalLineId") String approvalLineId,
+            @Param("displayYn") YesNo displayYn);
