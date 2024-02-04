@@ -1,57 +1,103 @@
-@Getter
-public enum YesNo {
-    Y(true, 1), N(false, 0);
 
-    private final boolean bool;
-    private final int oneOrZero;
+CREATE TABLE "approval_line" (
+  "APPROVAL_LINE_ID" varchar(40) NOT NULL COMMENT '결재 선 ID',
+  "COMPANY_CODE" varchar(20) NOT NULL COMMENT '회사 코드',
+  "PARENT_APPROVAL_LINE_ID" varchar(40) DEFAULT NULL COMMENT '부모 결재 선 ID',
+  "VERSION" int(11) NOT NULL DEFAULT 1 COMMENT '버전',
+  "DOCUMENT_ID" varchar(40) DEFAULT NULL COMMENT '문서 ID',
+  "DOCUMENT_SUBJECT" varchar(2000) DEFAULT NULL COMMENT '문서 제목',
+  "SYSTEM_CODE" varchar(20) DEFAULT NULL COMMENT '시스템 코드',
+  "CLASSIFICATION_CODE" varchar(20) DEFAULT NULL COMMENT '분류 코드',
+  "FORM_CODE" varchar(20) DEFAULT NULL COMMENT '양식 코드',
+  "PROCESS_ID" varchar(40) DEFAULT NULL COMMENT '프로세스 ID',
+  "APPROVAL_LINE_TYPE_CODE" varchar(20) DEFAULT NULL COMMENT '결재 선 유형 코드',
+  "APPROVAL_STATUS_CODE" varchar(20) DEFAULT NULL COMMENT '결재 현황 코드',
+  "APPROVAL_PROCESS_STATUS_CODE" varchar(20) DEFAULT NULL COMMENT '결재 진행 현황 코드',
+  "APPROVAL_DOCUMENT_STATUS_CODE" varchar(20) DEFAULT NULL COMMENT '결재 문서 현황 코드',
+  "CURRENT_APPROVER_ORDER_NO" int(11) DEFAULT NULL COMMENT '현 결재자 순서 번호',
+  "SUBMIT_TYPE_CODE" varchar(20) DEFAULT NULL COMMENT '상신 유형 코드',
+  "SUBMIT_CANCEL_TYPE_CODE" varchar(20) DEFAULT NULL COMMENT '상신 취소 유형 코드',
+  "RECEIVE_DEPARTMENT_EXIST_YN" char(1) NOT NULL DEFAULT 'N' COMMENT '수신 부서 존재 여부',
+  "GLOBAL_APPROVAL_YN" char(1) NOT NULL DEFAULT 'N' COMMENT '사간 결재 여부',
+  "USE_YN" char(1) NOT NULL DEFAULT 'Y' COMMENT '사용 여부',
+  "APPROVAL_LINE_START_DATETIME" timestamp NULL DEFAULT NULL COMMENT '결재 선 시작 일시',
+  "APPROVAL_LINE_FINAL_TYPE_CODE" varchar(20) DEFAULT NULL COMMENT '결재 선 종결 유형 코드',
+  "APPROVAL_LINE_FINAL_DATETIME" timestamp NULL DEFAULT NULL COMMENT '결재 선 종결 일시',
+  "ARCHIVE_YN" char(1) NOT NULL DEFAULT 'N' COMMENT '아카이브 전환 여부',
+  "CREATOR_ID" varchar(20) NOT NULL COMMENT '생성자 ID',
+  "CREATE_DATETIME" timestamp NOT NULL COMMENT '생성 일시',
+  "MODIFIER_ID" varchar(20) NOT NULL COMMENT '수정자 ID',
+  "MODIFY_DATETIME" timestamp NOT NULL COMMENT '수정 일시',
+  PRIMARY KEY ("APPROVAL_LINE_ID")
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='결재 선';
 
-    YesNo(boolean bool, int oneOrZero) {
-        this.bool = bool;
-        this.oneOrZero = oneOrZero;
-    }
+CREATE TABLE "approval_share" (
+  "APPROVAL_SHARE_ID" varchar(40) NOT NULL COMMENT '결재 공유 ID',
+  "APPROVAL_LINE_ID" varchar(40) NOT NULL COMMENT '결재 선 ID',
+  "PARENT_APPROVAL_LINE_ID" varchar(40) DEFAULT NULL COMMENT '부모 결재 선 ID',
+  "USE_YN" char(1) NOT NULL DEFAULT 'Y' COMMENT '사용 여부',
+  "CREATOR_ID" varchar(20) NOT NULL COMMENT '생성자 ID',
+  "CREATE_DATETIME" timestamp NOT NULL COMMENT '생성 일시',
+  "MODIFIER_ID" varchar(20) NOT NULL COMMENT '수정자 ID',
+  "MODIFY_DATETIME" timestamp NOT NULL COMMENT '수정 일시',
+  PRIMARY KEY ("APPROVAL_SHARE_ID")
+) ENGINE=InnoDB DE
 
-    public static YesNo of(boolean bool) {
-        return bool ? YesNo.Y : YesNo.N;
-    }
+-- line.approval_share_reader_view definition
 
-    public static YesNo of(int oneOrZero) throws Exception {
-        switch(oneOrZero) {
-            case 1 :
-                return YesNo.Y;
-            case 0 :
-                return YesNo.N;
-        }
+CREATE TABLE "approval_share_reader_view" (
+  "APPROVAL_SHARE_READER_VIEW_ID" varchar(40) NOT NULL COMMENT '결재 공유 화면 ID',
+  "APPROVAL_SHARE_ID" varchar(40) NOT NULL COMMENT '결재 공유 ID',
+  "READER_ORDER_NO" int(11) NOT NULL COMMENT '열람자 순서 번호',
+  "READ_YN" char(1) NOT NULL DEFAULT 'N' COMMENT '열람 여부',
+  "SHARE_DATETIME" timestamp NULL DEFAULT NULL COMMENT '공유 일시',
+  "READ_DATETIME" timestamp NULL DEFAULT NULL COMMENT '열람 일시',
+  "APPROVAL_SHARE_TYPE_CODE" varchar(20) DEFAULT NULL COMMENT '공유 유형 코드',
+  "READER_TYPE_CODE" varchar(20) DEFAULT NULL COMMENT '열람자 유형 코드',
+  "READER_ID" varchar(20) DEFAULT NULL COMMENT '열람자 ID',
+  "READER_NAME" varchar(100) DEFAULT NULL COMMENT '열람자 이름',
+  "READER_NAME_EN" varchar(100) DEFAULT NULL COMMENT '열람자 이름 영문',
+  "READER_USER_ID" varchar(20) DEFAULT NULL COMMENT '열람자 사용자 ID',
+  "READER_USER_NAME" varchar(100) DEFAULT NULL COMMENT '열람자 사용자 이름',
+  "READER_USER_NAME_EN" varchar(100) DEFAULT NULL COMMENT '열람자 사용자 이름 영문',
+  "READER_DEPARTMENT_CODE" varchar(50) DEFAULT NULL COMMENT '열람자 부서 코드',
+  "READER_DEPARTMENT_NAME" varchar(200) DEFAULT NULL COMMENT '열람자 부서 이름',
+  "READER_DEPARTMENT_NAME_EN" varchar(200) DEFAULT NULL COMMENT '열람자 부서 이름 영문',
+  "READER_COMPANY_CODE" varchar(20) DEFAULT NULL COMMENT '열람자 회사 코드',
+  "READER_COMPANY_NAME" varchar(100) DEFAULT NULL COMMENT '열람자 회사 이름',
+  "READER_COMPANY_NAME_EN" varchar(100) DEFAULT NULL COMMENT '열람자 회사 이름 영문',
+  "READER_DUTY_CODE" varchar(20) DEFAULT NULL COMMENT '열람자 보직 코드',
+  "READER_DUTY_NAME" varchar(100) DEFAULT NULL COMMENT '열람자 보직 이름',
+  "READER_DUTY_NAME_EN" varchar(100) DEFAULT NULL COMMENT '열람자 보직 이름 영문',
+  "READER_JOB_POSITION_CODE" varchar(20) DEFAULT NULL COMMENT '열람자 직위 코드',
+  "READER_JOB_POSITION_NAME" varchar(100) DEFAULT NULL COMMENT '열람자 직위 이름',
+  "READER_JOB_POSITION_NAME_EN" varchar(100) DEFAULT NULL COMMENT '열람자 직위 이름 영문',
+  "READER_ROLE_CODE" varchar(20) DEFAULT NULL COMMENT '열람자 롤 코드',
+  "READER_ROLE_NAME" varchar(100) DEFAULT NULL COMMENT '열람자 롤 이름',
+  "READER_ROLE_NAME_EN" varchar(100) DEFAULT NULL COMMENT '열람자 롤 이름 영문',
+  "READ_PHASE_TYPE_CODE" varchar(20) NOT NULL DEFAULT 'NONE' COMMENT '열람 단계 유형 코드',
+  "DISPLAY_YN" char(1) NOT NULL DEFAULT 'Y' COMMENT '화면 표시 여부',
+  "USE_YN" char(1) NOT NULL DEFAULT 'Y' COMMENT '사용 여부',
+  "CREATOR_ID" varchar(20) NOT NULL COMMENT '생성자 ID',
+  "CREATE_DATETIME" timestamp NOT NULL COMMENT '생성 일시',
+  "MODIFIER_ID" varchar(20) NOT NULL COMMENT '수정자 ID',
+  "MODIFY_DATETIME" timestamp NOT NULL COMMENT '수정 일시',
+  PRIMARY KEY ("APPROVAL_SHARE_READER_VIEW_ID")
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='결재 공유 열람자 화면';
 
-        throw new Exception();
-    }
 
-    @JsonCreator
-    public static YesNo parsing(String inputValue){
-        return Stream.of(values())
-                .filter(element -> element.toString().equals(inputValue.toUpperCase()))
-                .findFirst()
-                .orElse(null);
-    }
+세테이블을 APPROVAL_LINE_ID, APPROVAL_SHARE_ID로 조인하고 APPROVAL_LINE 테이블의 PROCESS_ID를 WHERE 조건으로 걸고,
+세 테이블의 USE_YN이 모두 'Y'인 데이터를 조회하는 JPA 메소드를
 
+@Repository
+public interface ApprovalShareReaderViewRepository extends JpaRepository<ApprovalShareReaderView, String> {
+
+    @Query("select asrv from ApprovalShareReaderView asrv " +
+            "join ApprovalShare asr on asrv.approvalShare.approvalShareId = asr.approvalShareId " +
+            "where asr.useYn = 'Y' and asrv.useYn = 'Y' " +
+            "and asr.approvalLine.approvalLineId = :approvalLineId " +
+            "and asrv.displayYn = :displayYn ")
+    List<ApprovalShareReaderView> findApprovalShareReaderViewByApprovalLineId(@Param("approvalLineId") String approvalLineId, @Param("displayYn") YesNo displayYn);
 }
 
-
-@Getter
-@ToString
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Builder // @Setter 제거하고 @Builder 어노테이션 적용
-public class ReaderListQueryInDto {
-    @NotNull
-    private String approvalLineId;
-    @NotNull
-    private String hiddenReaderFindYn;
-}
-
-
-hiddenReaderFindYn을 YesNo형태로 받도록 바꿔줘
-
->>
-
-@NotNull
-    @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private YesNo hiddenReaderFindYn;
+여기 안에다가 소스를 짜줘
