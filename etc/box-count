@@ -73,3 +73,16 @@ SUBMIT_DATETIME 으로 조건을 걸고 싶어. 특정 기간 사이의 값들�
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate);
 }
+
+ @Query("SELECT pdb FROM ProceedDocumentBox pdb " +
+            "JOIN pdb.documentStatus ds " +
+            "WHERE pdb.userId = :userId " +
+            "AND pdb.companyCode = :companyCode " +
+            "AND pdb.displayYn = :displayYn " +
+            "AND ds.displayYn = :documentStatusDisplayYn")
+    List<ProceedDocumentBox> findByUserIdAndCompanyCodeAndDisplayYnAndDocumentStatusDisplayYn(
+            @Param("userId") String userId,
+            @Param("companyCode") String companyCode,
+            @Param("displayYn") String displayYn,
+            @Param("documentStatusDisplayYn") String documentStatusDisplayYn);
+}
