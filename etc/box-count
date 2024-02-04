@@ -80,3 +80,17 @@ SUBMIT_DATETIME 으로 조건을 걸고 싶어. 특정 기간 사이의 값들�
             @Param("userId") String userId,
             @Param("fromDate") String fromDate,
             @Param("toDate") String toDate);
+
+
+@Query("SELECT COUNT(pdb) FROM ProceedDocumentBox pdb " +
+            "JOIN pdb.documentStatus ds " +
+            "WHERE pdb.companyCode = :companyCode " +
+            "AND (:userId IS NULL OR pdb.userId = :userId) " +
+            "AND pdb.displayYn = 'Y' " +
+            "AND ds.displayYn = 'Y' " +
+            "AND (:fromDate IS NULL OR :toDate IS NULL OR (ds.submitDatetime BETWEEN :fromDate AND :toDate))")
+    Integer customCountQuery(
+            @Param("companyCode") String companyCode,
+            @Param("userId") String userId,
+            @Param("fromDate") LocalDateTime fromDate,
+            @Param("toDate") LocalDateTime toDate);
