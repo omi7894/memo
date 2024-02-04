@@ -47,7 +47,7 @@ public BpmDocumentBoxCountQueryOutDto findPersonalDocumentBoxCount(BpmDocumentBo
  String str = "2022-02-14 12:30:45"; // 예시로 사용할 날짜 문자열
 
         // DateTimeFormatter를 사용하여 문자열을 LocalDateTime으로 변환
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
         LocalDateTime localDateTime = LocalDateTime.parse(str, formatter);
 
         // 변환된 LocalDateTime 출력
