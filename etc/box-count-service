@@ -1,73 +1,7 @@
-@Getter
-@ToString
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Builder
-public class BpmDocumentBoxCountQueryOutDto {
-    String userNextOrderCount;
-    String userFutureOrderCount;
-    String userProceedingCount;
-    String userReferenceCount;
-    String deptReceiveWaitCount;
-    String deptReceivingCount;
-    String SendingCount;
-}
-
-
-@Override
-    public BpmDocumentBoxCountQueryOutDto findPersonalDocumentBoxCount(BpmDocumentBoxCountQueryInDto inDto) {
-        Integer i = proceedDocumentBoxRepository.bpmDocumentBoxCountQuery(inDto.getCompanyCode(), inDto.getUserId(), inDto.getConditionDateFrom(), inDto.getConditionDateTo());
-        return null;
-    }
-
-    BpmDocumentBoxCountQueryOutDto.userProceedingCount에 i 값을 넣어서 반환해줘
-
-
-
-Certainly! If you want to set the value of both userProceedingCount and userNextOrderCount with the result i from the query, you can modify your method as follows:
-
-java
-Copy code
-@Override
-public BpmDocumentBoxCountQueryOutDto findPersonalDocumentBoxCount(BpmDocumentBoxCountQueryInDto inDto) {
-    Integer i = proceedDocumentBoxRepository.bpmDocumentBoxCountQuery(
-            inDto.getCompanyCode(),
-            inDto.getUserId(),
-            inDto.getConditionDateFrom(),
-            inDto.getConditionDateTo()
-    );
-
-    // Create a new instance of BpmDocumentBoxCountQueryOutDto with the values set to i
-    return BpmDocumentBoxCountQueryOutDto.builder()
-            .userProceedingCount(String.valueOf(i))
-            .userNextOrderCount(String.valueOf(i))
-            .build();
-}
-
-
- String str = "2022-02-14 12:30:45"; // 예시로 사용할 날짜 문자열
-
-        // DateTimeFormatter를 사용하여 문자열을 LocalDateTime으로 변환
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
-        LocalDateTime localDateTime = LocalDateTime.parse(str, formatter);
-
-        // 변환된 LocalDateTime 출력
-        System.out.println("Original String: " + str);
-        System.out.println("Converted LocalDateTime: " + localDateTime);
-
-
 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
-LocalDateTime fromLocalDateTime = LocalDateTime.parse(inDto.getConditionDateFrom(), formatter);
-LocalDateTime toLocalDateTime = LocalDateTime.parse(inDto.getConditionDateTo(), formatter);
-
-여기서 inDto.getConditionDateFrom()가 null이면 fromLocalDateTime도 null이 들어가도록 해줘
-
-
->>
-
-LocalDateTime fromLocalDateTime = inDto.getConditionDateFrom() != null
-        ? LocalDateTime.parse(inDto.getConditionDateFrom(), formatter)
-        : null;
-
-LocalDateTime toLocalDateTime = inDto.getConditionDateTo() != null
-        ? LocalDateTime.parse(inDto.getConditionDateTo(), formatter)
-        : null;
+        LocalDateTime fromLocalDateTime = inDto.getConditionDateFrom() != null
+                ? LocalDateTime.parse(inDto.getConditionDateFrom(), formatter)
+                : null;
+        LocalDateTime toLocalDateTime = inDto.getConditionDateTo() != null
+                ? LocalDateTime.parse(inDto.getConditionDateTo(), formatter)
+                : null;
