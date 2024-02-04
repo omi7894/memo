@@ -59,4 +59,38 @@ public class ApprovalShareReaderQueryOutDto {
 
 Entity인 ApprovalShareReaderView 리스트 안에 있는 값들을 꺼내서 List<BpmReferenceUserQueryOutDto> 형태로 return값을 반환해줘
 
-    
+
+>>
+
+@Override
+public List<BpmReferenceUserQueryOutDto> findBpmReferenceUserList(BpmReferenceUserQueryInDto inDto) {
+    return approvalShareReaderViewRepository.findBpmApprovalShareReaderViewByApprovalLineId(inDto.getProcessInstanceId())
+            .stream()
+            .map(approvalShareReaderView -> BpmReferenceUserQueryOutDto.builder()
+                    .approvalShareReaderViewId(approvalShareReaderView.getApprovalShareReaderViewId())
+                    .approvalShareId(approvalShareReaderView.getApprovalShare().getApprovalShareId())
+                    .readerOrderNo(approvalShareReaderView.getReaderOrderNo())
+                    .readYn(approvalShareReaderView.getReadYn())
+                    .shareDatetime(approvalShareReaderView.getShareDatetime())
+                    .readDatetime(approvalShareReaderView.getReadDatetime())
+                    .approvalShareTypeCode(approvalShareReaderView.getApprovalShareTypeCode())
+                    .readerTypeCode(approvalShareReaderView.getReaderTypeCode())
+                    .readerId(approvalShareReaderView.getReaderId())
+                    .readerName(approvalShareReaderView.getReaderName())
+                    .readerUserId(approvalShareReaderView.getReaderUserId())
+                    .readerUserName(approvalShareReaderView.getReaderUserName())
+                    .readerDepartmentCode(approvalShareReaderView.getReaderDepartmentCode())
+                    .readerDepartmentName(approvalShareReaderView.getReaderDepartmentName())
+                    .readerCompanyCode(approvalShareReaderView.getReaderCompanyCode())
+                    .readerCompanyName(approvalShareReaderView.getReaderCompanyName())
+                    .readerDutyCode(approvalShareReaderView.getReaderDutyCode())
+                    .readerDutyName(approvalShareReaderView.getReaderDutyName())
+                    .readerJobPositionCode(approvalShareReaderView.getReaderJobPositionCode())
+                    .readerJobPositionName(approvalShareReaderView.getReaderJobPositionName())
+                    .readerRoleCode(approvalShareReaderView.getReaderRoleCode())
+                    .readerRoleName(approvalShareReaderView.getReaderRoleName())
+                    .readPhaseTypeCode(approvalShareReaderView.getReadPhaseTypeCode())
+                    .displayYn(approvalShareReaderView.getDisplayYn())
+                    .build())
+            .collect(Collectors.toList());
+}
