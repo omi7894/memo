@@ -13,3 +13,56 @@ public interface ProceedDocumentBoxRepository extends JpaRepository<ProceedDocum
 }
 
 여기에 JPA로 구현해줘
+
+
+mariadb로 된 이 테이블에서 
+
+CREATE TABLE "document_status" (
+  "DOCUMENT_STATUS_ID" varchar(40) NOT NULL COMMENT '문서 현황 ID',
+  "APPROVAL_LINE_ID" varchar(40) NOT NULL COMMENT '결재선 ID',
+  "FORM_NAME" varchar(100) NOT NULL COMMENT '양식 명',
+  "DOCUMENT_TITLE" varchar(2000) DEFAULT NULL COMMENT '문서 제목',
+  "GLOBAL_DOCUMENT_YN" char(1) NOT NULL DEFAULT 'N' COMMENT '글로벌 문서 여부',
+  "APPROVAL_OPINION_YN" char(1) NOT NULL DEFAULT 'N' COMMENT '결재 의견 유무',
+  "ATTACH_FILE_YN" char(1) NOT NULL DEFAULT 'N' COMMENT '첨부 파일 유무',
+  "SECURITY_APPROVAL_YN" char(1) NOT NULL DEFAULT 'N' COMMENT '보안 결재 여부',
+  "SUBMITTER_ID" varchar(20) DEFAULT NULL COMMENT '기안자 ID',
+  "CREATER_ID" varchar(20) NOT NULL COMMENT '생성자 ID',
+  "CREATE_DATETIME" timestamp NOT NULL COMMENT '생성 일시',
+  "SUBMIT_DEPARTMENT_CODE" varchar(50) DEFAULT NULL COMMENT '기안 부서 코드',
+  "SUBMIT_DEPARTMENT_NAME" varchar(200) DEFAULT NULL COMMENT '기안 부서 명',
+  "SUBMIT_DATETIME" timestamp NULL DEFAULT NULL COMMENT '기안 일시',
+  "RECEIVE_DATETIME" timestamp NULL DEFAULT NULL COMMENT '수신 일시',
+  "COMPLETE_DATETIME" timestamp NULL DEFAULT NULL COMMENT '완료 일시',
+  "RETURN_DATETIME" timestamp NULL DEFAULT NULL COMMENT '반송 일시',
+  "CURRENT_APPROVER_NAME" varchar(100) DEFAULT NULL COMMENT '현 결재자 명',
+  "APPROVAL_LINE_CURRENT_NO" int(11) DEFAULT NULL COMMENT '결재선 현재 번호',
+  "SUBMITTER_NAME" varchar(100) DEFAULT NULL COMMENT '기안자 명',
+  "DOCUMENT_ID" varchar(250) NOT NULL COMMENT '문서 ID',
+  "APPROVAL_LINE_TOTAL_NO" int(11) DEFAULT NULL COMMENT '결재선 전체 번호',
+  "DISPLAY_YN" char(1) NOT NULL DEFAULT 'Y' COMMENT '표시 여부',
+  "FORM_CODE" varchar(30) NOT NULL COMMENT '양식 코드',
+  "FORM_CLASSIFICATION_CODE" varchar(20) NOT NULL COMMENT '양식 분류 코드',
+  "SYSTEM_CODE" varchar(20) NOT NULL COMMENT '시스템 코드',
+  "PARENT_APPROVAL_LINE_ID" varchar(40) DEFAULT NULL COMMENT '부모 결재선 ID',
+  "SUBMITTER_NAME_EN" varchar(100) DEFAULT NULL COMMENT '기안자 명 영문',
+  "SUBMIT_DEPARTMENT_NAME_EN" varchar(200) DEFAULT NULL COMMENT '기안 부서 명 영문',
+  "COMPANY_CODE" varchar(20) DEFAULT NULL COMMENT '회사 코드',
+  "WORK_VIEW_YN" char(1) NOT NULL DEFAULT 'N' COMMENT '업무뷰 여부',
+  "DOCUMENT_STATUS_CODE" varchar(20) NOT NULL COMMENT '문서 상태 코드',
+  "DOCUMENT_STATUS_NAME" varchar(100) NOT NULL COMMENT '문서 상태 명',
+  "DOCUMENT_STATUS_NAME_EN" varchar(100) NOT NULL COMMENT '문서 상태 명 영문',
+  "CURRENT_APPROVER_ID" varchar(20) DEFAULT NULL COMMENT '현 결재자 ID',
+  "MODIFIER_ID" varchar(20) NOT NULL COMMENT '수정자 ID',
+  "MODIFY_DATETIME" timestamp NOT NULL COMMENT '수정 일시',
+  "FORM_NAME_EN" varchar(100) DEFAULT NULL COMMENT '양식 명 영문',
+  "INFORMATION_SECURITY_YN" char(1) NOT NULL DEFAULT 'N' COMMENT '정보 보안 여부',
+  "BULK_APPROVAL_TYPE_CODE" varchar(20) DEFAULT NULL COMMENT '일괄 결재 유형 코드',
+  "CURRENT_APPROVER_NAME_EN" varchar(100) DEFAULT NULL COMMENT '현 결재자 명 영문',
+  PRIMARY KEY ("DOCUMENT_STATUS_ID")
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='문서 현황';
+
+
+SUBMIT_DATETIME 으로 조건을 걸고 싶어. 특정 기간 사이의 값들을 조회하도록.
+
+이때 where절 파라미터를 어떤형식으로 넘겨줘야할까?
