@@ -57,6 +57,17 @@ public BpmDocumentBoxCountQueryOutDto findPersonalDocumentBoxCount(BpmDocumentBo
 
 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
 LocalDateTime fromLocalDateTime = LocalDateTime.parse(inDto.getConditionDateFrom(), formatter);
-LocalDateTime toLocalDateTime = LocalDateTime.parse(inDto.getConditionDateTo(), formatter);\
+LocalDateTime toLocalDateTime = LocalDateTime.parse(inDto.getConditionDateTo(), formatter);
 
 여기서 inDto.getConditionDateFrom()가 null이면 fromLocalDateTime도 null이 들어가도록 해줘
+
+
+>>
+
+LocalDateTime fromLocalDateTime = inDto.getConditionDateFrom() != null
+        ? LocalDateTime.parse(inDto.getConditionDateFrom(), formatter)
+        : null;
+
+LocalDateTime toLocalDateTime = inDto.getConditionDateTo() != null
+        ? LocalDateTime.parse(inDto.getConditionDateTo(), formatter)
+        : null;
