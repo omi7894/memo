@@ -1,0 +1,22 @@
+@Getter
+@ToString
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Builder
+public class BpmDocumentBoxCountQueryOutDto {
+    String userNextOrderCount;
+    String userFutureOrderCount;
+    String userProceedingCount;
+    String userReferenceCount;
+    String deptReceiveWaitCount;
+    String deptReceivingCount;
+    String SendingCount;
+}
+
+
+@Override
+    public BpmDocumentBoxCountQueryOutDto findPersonalDocumentBoxCount(BpmDocumentBoxCountQueryInDto inDto) {
+        Integer i = proceedDocumentBoxRepository.bpmDocumentBoxCountQuery(inDto.getCompanyCode(), inDto.getUserId(), inDto.getConditionDateFrom(), inDto.getConditionDateTo());
+        return null;
+    }
+
+    BpmDocumentBoxCountQueryOutDto.userProceedingCount에 i 값을 넣어서 반환해줘
