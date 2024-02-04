@@ -1,12 +1,15 @@
-public Integer findProceedDocumentBoxCount(String companyCode, String userId) {
-        return dsl.select(DSL.count())
-                .from(DOCUMENT_STATUS)
-                .join(PROCEED_DOCUMENT_BOX).on(DOCUMENT_STATUS.DOCUMENT_STATUS_ID.eq(PROCEED_DOCUMENT_BOX.DOCUMENT_STATUS_ID))
-                .where(PROCEED_DOCUMENT_BOX.USER_ID.eq(userId))
-                .and(PROCEED_DOCUMENT_BOX.COMPANY_CODE.eq(companyCode))
-                .and(PROCEED_DOCUMENT_BOX.DISPLAY_YN.eq("Y"))
-                .and(DOCUMENT_STATUS.DISPLAY_YN.eq("Y"))
-                .fetchOneInto(Integer.class);
-    }
+select * from proceed_document_box a
+join document_status b
+on a.DOCUMENT_STATUS_ID = b.DOCUMENT_STATUS_ID 
+where a.USER_ID = '1234'
+and a.COMPANY_CODE = 'test'
+and a.DISPLAY_YN = 'Y'
+and b.DISPLAY_YN  = 'Y'
 
-    jooq로 된 이것을 jpa로 바꿔줘
+이 쿼리를
+
+public interface ProceedDocumentBoxRepository extends JpaRepository<ProceedDocumentBox, String> {
+    List<ProceedDocumentBox> findByCompanyCodeAndUserId(String companyCode, String userId);
+}
+
+여기에 JPA로 구현해줘
