@@ -16,8 +16,8 @@ List<ApprovalShareReaderQueryOutDto> findSharedUserList(ReaderListQueryInDto que
 
 
 ## ShareServiceImpl
-ApprovalShareReaderViewRepository approvalShareReaderViewRepository;
-ApprovalShareReaderViewAggregate approvalShareReaderViewAggregate;
+private final ApprovalShareReaderViewRepository approvalShareReaderViewRepository;
+private final ApprovalShareReaderViewAggregate approvalShareReaderViewAggregate;
     @Override
     public List<ApprovalShareReaderQueryOutDto> findSharedUserList(ReaderListQueryInDto queryInDto) {
         List<ApprovalShareReaderView> list = approvalShareReaderViewRepository.findApprovalShareReaderViewByApprovalLineId(queryInDto.getApprovalLineId());
