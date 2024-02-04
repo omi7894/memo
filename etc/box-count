@@ -66,3 +66,10 @@ CREATE TABLE "document_status" (
 SUBMIT_DATETIME 으로 조건을 걸고 싶어. 특정 기간 사이의 값들을 조회하도록.
 
 이때 where절 파라미터를 어떤형식으로 넘겨줘야할까?
+
+>>
+    @Query("SELECT ds FROM DocumentStatus ds WHERE ds.submitDatetime BETWEEN :startDate AND :endDate")
+    List<DocumentStatus> findBySubmitDatetimeBetween(
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate);
+}
