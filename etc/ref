@@ -1,4 +1,42 @@
 @Getter
+public enum YesNo {
+    Y(true, 1), N(false, 0);
+
+    private final boolean bool;
+    private final int oneOrZero;
+
+    YesNo(boolean bool, int oneOrZero) {
+        this.bool = bool;
+        this.oneOrZero = oneOrZero;
+    }
+
+    public static YesNo of(boolean bool) {
+        return bool ? YesNo.Y : YesNo.N;
+    }
+
+    public static YesNo of(int oneOrZero) throws Exception {
+        switch(oneOrZero) {
+            case 1 :
+                return YesNo.Y;
+            case 0 :
+                return YesNo.N;
+        }
+
+        throw new Exception();
+    }
+
+    @JsonCreator
+    public static YesNo parsing(String inputValue){
+        return Stream.of(values())
+                .filter(element -> element.toString().equals(inputValue.toUpperCase()))
+                .findFirst()
+                .orElse(null);
+    }
+
+}
+
+
+@Getter
 @ToString
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder // @Setter 제거하고 @Builder 어노테이션 적용
@@ -10,119 +48,4 @@ public class ReaderListQueryInDto {
 }
 
 
-@Transactional(readOnly = true)
-@Service
-@Slf4j
-@RequiredArgsConstructor
-public class ShareServiceImpl implements ShareService {
-    private final ApprovalShareReaderViewRepository approvalShareReaderViewRepository;
-    private final ApprovalShareReaderViewAggregate approvalShareReaderViewAggregate;
-    @Override
-    public List<ApprovalShareReaderQueryOutDto> findSharedUserList(ReaderListQueryInDto inDto) {
-        List<ApprovalShareReaderView> list = approvalShareReaderViewRepository.findApprovalShareReaderViewByApprovalLineId(inDto.getApprovalLineId(), inDto.getHiddenReaderFindYn());
-
-        return list.stream()
-                .map(approvalShareReaderViewAggregate::createApprovalShareReaderQueryOutDto)
-                .collect(Collectors.toList());
-    }
-
-}
-
-
-
-@Repository
-public interface ApprovalShareReaderViewRepository extends JpaRepository<ApprovalShareReaderView, String> {
-
-    @Modifying
-    @Query("delete ApprovalShareReaderView apvsr " +
-            "where apvsr.approvalShareReaderViewId in :idList")
-    int bulkDeleteById(@Param("idList") List<String> idList);
-
-    Optional<ApprovalShareReaderView> findByApprovalShareReaderViewIdAndUseYn(String approvalShareReaderViewId, YesNo yesNo);
-
-    @Query("select asrv from ApprovalShareReaderView asrv " +
-            "join ApprovalShare asr on asrv.approvalShare.approvalShareId = asr.approvalShareId " +
-            "where asr.useYn = 'Y' and asrv.useYn = 'Y' " +
-            "and asr.approvalLine.approvalLineId = :approvalLineId " +
-            "and asrv.displayYn = :displayYn ")
-    List<ApprovalShareReaderView> findApprovalShareReaderViewByApprovalLineId(@Param("approvalLineId") String approvalLineId, @Param("displayYn") String displayYn);
-}
-
-
-public class ApprovalShareReaderView extends BaseEntity implements Persistable<String> {
-
-    @Id
-    @Column(name = "APPROVAL_SHARE_READER_VIEW_ID")
-    private String approvalShareReaderViewId;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "APPROVAL_SHARE_ID")
-    private ApprovalShare approvalShare;
-    @Column(name = "READER_ORDER_NO")
-    private int readerOrderNo;
-    @Enumerated(EnumType.STRING)
-    @Column(name = "READ_YN")
-    private YesNo readYn;
-    @Column(name = "SHARE_DATETIME")
-    private LocalDateTime shareDatetime;
-    @Column(name = "READ_DATETIME")
-    private LocalDateTime readDatetime;
-    @Enumerated(EnumType.STRING)
-    @Column(name = "APPROVAL_SHARE_TYPE_CODE")
-    private ApprovalShareType approvalShareTypeCode;
-    @Enumerated(EnumType.STRING)
-    @Column(name = "READER_TYPE_CODE")
-    private ReaderType readerTypeCode;
-    @Column(name = "READER_ID")
-    private String readerId;
-    @Column(name = "READER_NAME")
-    private String readerName;
-    @Column(name = "READER_NAME_EN")
-    private String readerNameEn;
-    @Column(name = "READER_USER_ID")
-    private String readerUserId;
-    @Column(name = "READER_USER_NAME")
-    private String readerUserName;
-    @Column(name = "READER_USER_NAME_EN")
-    private String readerUserNameEn;
-    @Column(name = "READER_DEPARTMENT_CODE")
-    private String readerDepartmentCode;
-    @Column(name = "READER_DEPARTMENT_NAME")
-    private String readerDepartmentName;
-    @Column(name = "READER_DEPARTMENT_NAME_EN")
-    private String readerDepartmentNameEn;
-    @Column(name = "READER_COMPANY_CODE")
-    private String readerCompanyCode;
-    @Column(name = "READER_COMPANY_NAME")
-    private String readerCompanyName;
-    @Column(name = "READER_COMPANY_NAME_EN")
-    private String readerCompanyNameEn;
-    @Column(name = "READER_DUTY_CODE")
-    private String readerDutyCode;
-    @Column(name = "READER_DUTY_NAME")
-    private String readerDutyName;
-    @Column(name = "READER_DUTY_NAME_EN")
-    private String readerDutyNameEn;
-    @Column(name = "READER_JOB_POSITION_CODE")
-    private String readerJobPositionCode;
-    @Column(name = "READER_JOB_POSITION_NAME")
-    private String readerJobPositionName;
-    @Column(name = "READER_JOB_POSITION_NAME_EN")
-    private String readerJobPositionNameEn;
-    @Column(name = "READER_ROLE_CODE")
-    private String readerRoleCode;
-    @Column(name = "READER_ROLE_NAME")
-    private String readerRoleName;
-    @Column(name = "READER_ROLE_NAME_EN")
-    private String readerRoleNameEn;
-    @Enumerated(EnumType.STRING)
-    @Column(name = "READ_PHASE_TYPE_CODE")
-    private ReadPhaseType readPhaseTypeCode;
-    @Enumerated(EnumType.STRING)
-    @Column(name = "DISPLAY_YN")
-    private YesNo displayYn;
-    @Enumerated(EnumType.STRING)
-    @Column(name = "USE_YN")
-    private YesNo useYn;
-
-
-  여기서 String 으로 받은 displayYn 을 YesNo 타입으로 바꿔줘
+hiddenReaderFindYn을 YesNo형태로 받도록 바꿔줘
