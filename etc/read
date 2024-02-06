@@ -184,3 +184,21 @@ public class ShareCommandServiceImpl implements ShareCommandService {
 }
 updateBpmReferenceRead 메소드에서 ApprovalShareReaderViewRepository.updateReadStatusByApprovalLineId를 사용할게
 
+>>>>>>>>>
+
+
+
+
+@Override
+    public void updateBpmReferenceRead(BpmReferenceReadUpdateCommandInDto bpmReferenceReadUpdateCommandInDto) {
+        log.info("=====================================updateBpmReferenceRead=====================================");
+        
+        // ApprovalShareReaderViewRepository를 이용하여 업데이트 수행
+        int updatedRows = approvalShareReaderViewRepository.updateReadStatusByApprovalLineId(
+                bpmReferenceReadUpdateCommandInDto.getApprovalLineId(),
+                bpmReferenceReadUpdateCommandInDto.getReadDatetime()
+        );
+
+        log.info("Updated {} rows in ApprovalShareReaderView table.", updatedRows);
+    }
+
