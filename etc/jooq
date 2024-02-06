@@ -131,8 +131,42 @@ public class ApprovalShareReaderViewCustomRepositoryImpl implements ApprovalShar
 
 
  Result<ReferenceUserQueryOutJooqDto> result = dsl.select(
+                ApprovalShareReaderView.APPROVAL_SHARE_READER_VIEW.APPROVAL_SHARE_READER_VIEW_ID,
+                ApprovalShareReaderView.APPROVAL_SHARE_READER_VIEW.APPROVAL_SHARE_ID,
                 ApprovalShareReaderView.APPROVAL_SHARE_READER_VIEW.READER_ORDER_NO,
-                // ... (add other fields)
+                ApprovalShareReaderView.APPROVAL_SHARE_READER_VIEW.READ_YN,
+                ApprovalShareReaderView.APPROVAL_SHARE_READER_VIEW.SHARE_DATETIME,
+                ApprovalShareReaderView.APPROVAL_SHARE_READER_VIEW.READ_DATETIME,
+                ApprovalShareReaderView.APPROVAL_SHARE_READER_VIEW.APPROVAL_SHARE_TYPE_CODE,
+                ApprovalShareReaderView.APPROVAL_SHARE_READER_VIEW.READER_TYPE_CODE,
+                ApprovalShareReaderView.APPROVAL_SHARE_READER_VIEW.READER_ID,
+                ApprovalShareReaderView.APPROVAL_SHARE_READER_VIEW.READER_NAME,
+                ApprovalShareReaderView.APPROVAL_SHARE_READER_VIEW.READER_NAME_EN,
+                ApprovalShareReaderView.APPROVAL_SHARE_READER_VIEW.READER_USER_ID,
+                ApprovalShareReaderView.APPROVAL_SHARE_READER_VIEW.READER_USER_NAME,
+                ApprovalShareReaderView.APPROVAL_SHARE_READER_VIEW.READER_USER_NAME_EN,
+                ApprovalShareReaderView.APPROVAL_SHARE_READER_VIEW.READER_DEPARTMENT_CODE,
+                ApprovalShareReaderView.APPROVAL_SHARE_READER_VIEW.READER_DEPARTMENT_NAME,
+                ApprovalShareReaderView.APPROVAL_SHARE_READER_VIEW.READER_DEPARTMENT_NAME_EN,
+                ApprovalShareReaderView.APPROVAL_SHARE_READER_VIEW.READER_COMPANY_CODE,
+                ApprovalShareReaderView.APPROVAL_SHARE_READER_VIEW.READER_COMPANY_NAME,
+                ApprovalShareReaderView.APPROVAL_SHARE_READER_VIEW.READER_COMPANY_NAME_EN,
+                ApprovalShareReaderView.APPROVAL_SHARE_READER_VIEW.READER_DUTY_CODE,
+                ApprovalShareReaderView.APPROVAL_SHARE_READER_VIEW.READER_DUTY_NAME,
+                ApprovalShareReaderView.APPROVAL_SHARE_READER_VIEW.READER_DUTY_NAME_EN,
+                ApprovalShareReaderView.APPROVAL_SHARE_READER_VIEW.READER_JOB_POSITION_CODE,
+                ApprovalShareReaderView.APPROVAL_SHARE_READER_VIEW.READER_JOB_POSITION_NAME,
+                ApprovalShareReaderView.APPROVAL_SHARE_READER_VIEW.READER_JOB_POSITION_NAME_EN,
+                ApprovalShareReaderView.APPROVAL_SHARE_READER_VIEW.READER_ROLE_CODE,
+                ApprovalShareReaderView.APPROVAL_SHARE_READER_VIEW.READER_ROLE_NAME,
+                ApprovalShareReaderView.APPROVAL_SHARE_READER_VIEW.READER_ROLE_NAME_EN,
+                ApprovalShareReaderView.APPROVAL_SHARE_READER_VIEW.READ_PHASE_TYPE_CODE,
+                ApprovalShareReaderView.APPROVAL_SHARE_READER_VIEW.DISPLAY_YN,
+                ApprovalShareReaderView.APPROVAL_SHARE_READER_VIEW.USE_YN,
+                ApprovalShareReaderView.APPROVAL_SHARE_READER_VIEW.CREATOR_ID,
+                ApprovalShareReaderView.APPROVAL_SHARE_READER_VIEW.CREATE_DATETIME,
+                ApprovalShareReaderView.APPROVAL_SHARE_READER_VIEW.MODIFIER_ID,
+                ApprovalShareReaderView.APPROVAL_SHARE_READER_VIEW.MODIFY_DATETIME
                 ApprovalLine.APPROVAL_LINE.APPROVAL_LINE_ID // additional field example
         )
                 .from(ApprovalShareReaderView.APPROVAL_SHARE_READER_VIEW)
