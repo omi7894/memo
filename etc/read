@@ -1,219 +1,42 @@
-CREATE TABLE "approval_share" (
-  "APPROVAL_SHARE_ID" varchar(40) NOT NULL COMMENT '결재 공유 ID',
-  "APPROVAL_LINE_ID" varchar(40) NOT NULL COMMENT '결재 선 ID',
-  "PARENT_APPROVAL_LINE_ID" varchar(40) DEFAULT NULL COMMENT '부모 결재 선 ID',
-  "USE_YN" char(1) NOT NULL DEFAULT 'Y' COMMENT '사용 여부',
-  "CREATOR_ID" varchar(20) NOT NULL COMMENT '생성자 ID',
-  "CREATE_DATETIME" timestamp NOT NULL COMMENT '생성 일시',
-  "MODIFIER_ID" varchar(20) NOT NULL COMMENT '수정자 ID',
-  "MODIFY_DATETIME" timestamp NOT NULL COMMENT '수정 일시',
-  PRIMARY KEY ("APPROVAL_SHARE_ID")
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='결재 공유';
-
-
-CREATE TABLE "approval_share_reader_view" (
-  "APPROVAL_SHARE_READER_VIEW_ID" varchar(40) NOT NULL COMMENT '결재 공유 화면 ID',
-  "APPROVAL_SHARE_ID" varchar(40) NOT NULL COMMENT '결재 공유 ID',
-  "READER_ORDER_NO" int(11) NOT NULL COMMENT '열람자 순서 번호',
-  "READ_YN" char(1) NOT NULL DEFAULT 'N' COMMENT '열람 여부',
-  "SHARE_DATETIME" timestamp NULL DEFAULT NULL COMMENT '공유 일시',
-  "READ_DATETIME" timestamp NULL DEFAULT NULL COMMENT '열람 일시',
-  "APPROVAL_SHARE_TYPE_CODE" varchar(20) DEFAULT NULL COMMENT '공유 유형 코드',
-  "READER_TYPE_CODE" varchar(20) DEFAULT NULL COMMENT '열람자 유형 코드',
-  "READER_ID" varchar(20) DEFAULT NULL COMMENT '열람자 ID',
-  "READER_NAME" varchar(100) DEFAULT NULL COMMENT '열람자 이름',
-  "READER_NAME_EN" varchar(100) DEFAULT NULL COMMENT '열람자 이름 영문',
-  "READER_USER_ID" varchar(20) DEFAULT NULL COMMENT '열람자 사용자 ID',
-  "READER_USER_NAME" varchar(100) DEFAULT NULL COMMENT '열람자 사용자 이름',
-  "READER_USER_NAME_EN" varchar(100) DEFAULT NULL COMMENT '열람자 사용자 이름 영문',
-  "READER_DEPARTMENT_CODE" varchar(50) DEFAULT NULL COMMENT '열람자 부서 코드',
-  "READER_DEPARTMENT_NAME" varchar(200) DEFAULT NULL COMMENT '열람자 부서 이름',
-  "READER_DEPARTMENT_NAME_EN" varchar(200) DEFAULT NULL COMMENT '열람자 부서 이름 영문',
-  "READER_COMPANY_CODE" varchar(20) DEFAULT NULL COMMENT '열람자 회사 코드',
-  "READER_COMPANY_NAME" varchar(100) DEFAULT NULL COMMENT '열람자 회사 이름',
-  "READER_COMPANY_NAME_EN" varchar(100) DEFAULT NULL COMMENT '열람자 회사 이름 영문',
-  "READER_DUTY_CODE" varchar(20) DEFAULT NULL COMMENT '열람자 보직 코드',
-  "READER_DUTY_NAME" varchar(100) DEFAULT NULL COMMENT '열람자 보직 이름',
-  "READER_DUTY_NAME_EN" varchar(100) DEFAULT NULL COMMENT '열람자 보직 이름 영문',
-  "READER_JOB_POSITION_CODE" varchar(20) DEFAULT NULL COMMENT '열람자 직위 코드',
-  "READER_JOB_POSITION_NAME" varchar(100) DEFAULT NULL COMMENT '열람자 직위 이름',
-  "READER_JOB_POSITION_NAME_EN" varchar(100) DEFAULT NULL COMMENT '열람자 직위 이름 영문',
-  "READER_ROLE_CODE" varchar(20) DEFAULT NULL COMMENT '열람자 롤 코드',
-  "READER_ROLE_NAME" varchar(100) DEFAULT NULL COMMENT '열람자 롤 이름',
-  "READER_ROLE_NAME_EN" varchar(100) DEFAULT NULL COMMENT '열람자 롤 이름 영문',
-  "READ_PHASE_TYPE_CODE" varchar(20) NOT NULL DEFAULT 'NONE' COMMENT '열람 단계 유형 코드',
-  "DISPLAY_YN" char(1) NOT NULL DEFAULT 'Y' COMMENT '화면 표시 여부',
-  "USE_YN" char(1) NOT NULL DEFAULT 'Y' COMMENT '사용 여부',
-  "CREATOR_ID" varchar(20) NOT NULL COMMENT '생성자 ID',
-  "CREATE_DATETIME" timestamp NOT NULL COMMENT '생성 일시',
-  "MODIFIER_ID" varchar(20) NOT NULL COMMENT '수정자 ID',
-  "MODIFY_DATETIME" timestamp NOT NULL COMMENT '수정 일시',
-  PRIMARY KEY ("APPROVAL_SHARE_READER_VIEW_ID")
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='결재 공유 열람자 화면';
-
-두 테이블을 APPROVAL_SHARE_ID로 조인하고, 
-두 테이블의 USE_YN 이 'Y'인것을 where조건으로 걸어주고,
-approval_share 의 APPROVAL_LINE_ID와 PARENT_APPROVAL_LINE_ID을 where 조건으로 걸어줘.
-
-그 데이터의 READ_YN 을 'Y'로 업데이트 하고, 
-READ_DATETIME을 파라미터 값으로 없데이트 해줘.
-
-이 로직을 JPA 로
-
-@Repository
-public interface ApprovalShareReaderViewRepository extends JpaRepository<ApprovalShareReaderView, String> {
-
-    @Modifying
-    @Query("delete ApprovalShareReaderView apvsr " +
-            "where apvsr.approvalShareReaderViewId in :idList")
-    int bulkDeleteById(@Param("idList") List<String> idList);
-
-    Optional<ApprovalShareReaderView> findByApprovalShareReaderViewIdAndUseYn(String approvalShareReaderViewId, YesNo yesNo);
-
-    @Query("select asrv from ApprovalShareReaderView asrv " +
-            "join ApprovalShare asr on asrv.approvalShare.approvalShareId = asr.approvalShareId " +
-            "where asr.useYn = 'Y' and asrv.useYn = 'Y' " +
-            "and asr.approvalLine.approvalLineId = :approvalLineId " +
-            "and asrv.displayYn = :displayYn ")
-    List<ApprovalShareReaderView> findApprovalShareReaderViewByApprovalLineId(@Param("approvalLineId") String approvalLineId, @Param("displayYn") YesNo displayYn);
-
-    @Query("SELECT asrv FROM ApprovalShareReaderView asrv " +
+@Query("SELECT asrv FROM ApprovalShareReaderView asrv " +
             "JOIN ApprovalShare asr ON asrv.approvalShare.approvalShareId = asr.approvalShareId " +
             "JOIN ApprovalLine al ON asr.approvalLine.approvalLineId = al.approvalLineId " +
             "WHERE asr.useYn = 'Y' AND asrv.useYn = 'Y' AND al.useYn = 'Y' " +
-            "AND al.processId = :processId ")
-    List<ApprovalShareReaderView> findBpmApprovalShareReaderViewByApprovalLineId(@Param("processId") String processId);
-}
+            "AND al.approvalLineId = :approvalLineId ")
+    List<ApprovalShareReaderView> findBpmApprovalShareReaderViewByApprovalLineId(@Param("approvalLineId") String approvalLineId);
+
+이걸 jooq로 구현하면?
 
 
+public class ApprovalLineOfDocumentRepositoryCustomImpl implements ApprovalLineOfDocumentRepositoryCustom {
 
-여기에 구현해줘
-
-
->>>>>>
-@Modifying
-    @Query("update ApprovalShareReaderView asrv set asrv.readYn = 'Y', asrv.readDatetime = :readDatetime " +
-            "where asrv.approvalShare.approvalShareId in " +
-            "(select asr.approvalShareId from ApprovalShare asr " +
-            "where asr.useYn = 'Y' and asr.approvalLine.approvalLineId = :approvalLineId " +
-            "and (asr.approvalLine.approvalLineId = :approvalLineId or asr.parentApprovalLine.approvalLineId = :approvalLineId)) " +
-            "and asrv.useYn = 'Y'")
-    int updateReadStatusByApprovalLineId(@Param("approvalLineId") String approvalLineId, @Param("readDatetime") LocalDateTime readDatetime);
-
-
->>>
-
-
-@Transactional
-@Service
-@Slf4j
-@RequiredArgsConstructor
-public class ShareCommandServiceImpl implements ShareCommandService {
-
-    private final ApprovalLineRepository approvalLineRepository;
-    private final ApprovalShareRepository approvalShareRepository;
-    private final ApprovalShareAggregate approvalShareAggregate;
-    private final ApprovalShareReaderViewAggregate approvalShareReaderViewAggregate;
-    private final ApprovalShareSharerViewAggregate approvalShareSharerViewAggregate;
+    private final DSLContext dsl;
     @Override
-    public ApprovalShareCreateCommandOutDto createShareEntities(ApprovalShareCreateCommandInDto createCommandInDto) {
-        log.info("=====================================createShareEntities=====================================");
-        // 결재선 실제로 존재하는 지 확인
-        ApprovalLine approvalLine = approvalLineRepository.findOneToOneFetchByApprovalLineIdAndUseYn(createCommandInDto.getApprovalLineId(), YesNo.Y)
-                .orElseThrow(() -> new NotFoundException("ApprovalLine"));
-
-        //이미 존재하는 공유 열람자인지 확인
-        createCommandInDto.getApprovalShareReaderList().forEach(readerDto -> {
-            if (!approvalShareRepository.findApprovalShareByApprovalLineIdAndReaderUserId(createCommandInDto.getApprovalLineId(), readerDto.getReaderId()).isEmpty()) {
-                throw new DuplicateException(readerDto.getReaderId());
-            }
-        });
-
-        // 결재 공유 열람자 화면 생성
-        List<ApprovalShareReaderView> approvalShareReaderViewList = createApprovalShareReaderViewList(createCommandInDto.getApprovalShareReaderList());
-        List<String> approvalShareReaderViewIdList = approvalShareReaderViewList.stream().map(ApprovalShareReaderView::getApprovalShareReaderViewId).collect(Collectors.toList());
-
-        // 결재 공유 공유자 화면 생성
-        ApprovalShareSharerView approvalShareSharerView = createApprovalShareSharerView(createCommandInDto.getApprovalShareSharer());
-
-        // 결재 공유 생성
-        ApprovalShare approvalShare = createApprovalShare(createCommandInDto.getParentApprovalLineId(), approvalShareReaderViewList, approvalShareSharerView, approvalLine);
-
-        return ApprovalShareCreateCommandOutDto.builder()
-                .approvalShareId(approvalShare.getApprovalShareId())
-                .approvalShareSharerViewId(approvalShareSharerView.getApprovalShareSharerViewId())
-                .approvalShareReaderViewIdList(approvalShareReaderViewIdList)
-                .build();
+    public List<ApprovalLineAndSendReceiveQueryOutJooqDto> findApprovalDetailList() {
+        return dsl.select(
+            ApprovalLine.APPROVAL_LINE.APPROVAL_LINE_ID ,
+            ApprovalLine.APPROVAL_LINE.VERSION ,
+            ApprovalLine.APPROVAL_LINE.PROCESS_ID ,
+            ApprovalLine.APPROVAL_LINE.APPROVAL_LINE_TYPE_CODE,
+            ApprovalLine.APPROVAL_LINE.APPROVAL_PROCESS_STATUS_CODE,
+            ApprovalLine.APPROVAL_LINE.APPROVAL_DOCUMENT_STATUS_CODE,
+            ApprovalLine.APPROVAL_LINE.CURRENT_APPROVER_ORDER_NO,
+            ApprovalLine.APPROVAL_LINE.RECEIVE_DEPARTMENT_EXIST_YN,
+            ApprovalLine.APPROVAL_LINE.GLOBAL_APPROVAL_YN,
+            SendReceive.SEND_RECEIVE.SEND_RECEIVE_ID,
+            SendReceive.SEND_RECEIVE.RECEIVE_COMPANY_CODE,
+            SendReceive.SEND_RECEIVE.RECEIVE_COMPANY_NAME,
+            SendReceive.SEND_RECEIVE.RECEIVE_COMPANY_NAME_EN,
+            SendReceive.SEND_RECEIVE.RECEIVE_DEPARTMENT_CODE ,
+            SendReceive.SEND_RECEIVE.RECEIVE_DEPARTMENT_NAME ,
+            SendReceive.SEND_RECEIVE.RECEIVE_DEPARTMENT_NAME_EN ,
+            SendReceive.SEND_RECEIVE.RECEIVE_DATETIME ,
+            SendReceive.SEND_RECEIVE.REVIEW_COMPLETE_YN
+                ).from(ApprovalLine.APPROVAL_LINE)
+                    .leftJoin(SendReceive.SEND_RECEIVE)
+                    .on(ApprovalLine.APPROVAL_LINE.RECEIVE_DEPARTMENT_EXIST_YN.eq("Y"))
+                    .and(ApprovalLine.APPROVAL_LINE.APPROVAL_LINE_ID.eq(SendReceive.SEND_RECEIVE.SEND_APPROVAL_LINE_ID))
+                    .and(SendReceive.SEND_RECEIVE.USE_YN.eq("Y"))
+                .fetchInto(ApprovalLineAndSendReceiveQueryOutJooqDto.class);
     }
-
-    @Override
-    public ApprovalShare createApprovalShare(String parentApprovalLineId, List<ApprovalShareReaderView> approvalShareReaderViewList, ApprovalShareSharerView approvalShareSharerView, ApprovalLine approvalLine) {
-        ApprovalShareCreateCommandInLogicDto logicDto = ApprovalShareCreateCommandInLogicDto.builder()
-                .parentApprovalLineId(parentApprovalLineId)
-                .build();
-        return approvalShareAggregate.insertApprovalShareEntityInApprovalShare(logicDto, approvalShareSharerView, approvalShareReaderViewList, approvalLine);
-    }
-
-    @Override
-    public ApprovalShareSharerView createApprovalShareSharerView(ApprovalShareSharerCreateCommandInDto inDto) {
-        if(ObjectUtils.isEmpty(inDto))
-            return null;
-        ApprovalShareSharerCreateCommandInLogicDto logicDto = ApprovalShareSharerCreateCommandInLogicDto.createApprovalShareSharerCreateCommandInLogicDto();
-        return approvalShareSharerViewAggregate.insertApprovalShareReaderViewEntityInApprovalShare(inDto, logicDto);
-    }
-
-    @Override
-    public List<ApprovalShareReaderView> createApprovalShareReaderViewList(List<ApprovalShareReaderCreateCommandInDto> approvalShareReaderDtoList) {
-        if(CollectionUtils.isEmpty(approvalShareReaderDtoList))
-            return new ArrayList<>();
-        return approvalShareReaderDtoList.stream().map(this::createApprovalShareReaderView).collect(Collectors.toList());
-    }
-
-    @Override
-    public ApprovalShareReaderView createApprovalShareReaderView(ApprovalShareReaderCreateCommandInDto inDto) {
-        ApprovalShareReaderCreateCommandInLogicDto logicDto = ApprovalShareReaderCreateCommandInLogicDto.createApprovalShareReaderCreateCommandInLogicDto();
-        return approvalShareReaderViewAggregate.insertApprovalShareReaderViewEntityInApprovalShare(inDto, logicDto);
-    }
-
-    @Override
-    public void updateBpmReferenceRead(BpmReferenceReadUpdateCommandInDto bpmReferenceReadUpdateCommandInDto) {
-
-    }
-
-
-}
-updateBpmReferenceRead 메소드에서 ApprovalShareReaderViewRepository.updateReadStatusByApprovalLineId를 사용할게
-
->>>>>>>>>
-
-
-
-
-@Override
-    public void updateBpmReferenceRead(BpmReferenceReadUpdateCommandInDto bpmReferenceReadUpdateCommandInDto) {
-        log.info("=====================================updateBpmReferenceRead=====================================");
-        
-        // ApprovalShareReaderViewRepository를 이용하여 업데이트 수행
-        int updatedRows = approvalShareReaderViewRepository.updateReadStatusByApprovalLineId(
-                bpmReferenceReadUpdateCommandInDto.getApprovalLineId(),
-                bpmReferenceReadUpdateCommandInDto.getReadDatetime()
-        );
-
-        log.info("Updated {} rows in ApprovalShareReaderView table.", updatedRows);
-    }
-
-
->>>
-
-
-LocalDateTime readDatetime = LocalDateTime.parse(bpmReferenceReadUpdateCommandInDto.getReadDatetime(), DateTimeFormatter.ISO_DATE_TIME);
-
->>>
-
-
-yyyyMMddHHmmss
-
->>>>
-
-DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
-    LocalDateTime readDatetime = LocalDateTime.parse(bpmReferenceReadUpdateCommandInDto.getReadDatetime(), formatter);
+이런식으로
