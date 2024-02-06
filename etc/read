@@ -40,3 +40,17 @@ public class ApprovalLineOfDocumentRepositoryCustomImpl implements ApprovalLineO
                 .fetchInto(ApprovalLineAndSendReceiveQueryOutJooqDto.class);
     }
 이런식으로
+
+
+>>>>
+
+
+return dsl.select()
+                .from(ApprovalShareReaderView.APPROVAL_SHARE_READER_VIEW)
+                .join(ApprovalShare.APPROVAL_SHARE).on(ApprovalShareReaderView.APPROVAL_SHARE_READER_VIEW.APPROVAL_SHARE_ID.eq(ApprovalShare.APPROVAL_SHARE.APPROVAL_SHARE_ID))
+                .join(ApprovalLine.APPROVAL_LINE).on(ApprovalShare.APPROVAL_SHARE.APPROVAL_LINE_ID.eq(ApprovalLine.APPROVAL_LINE.APPROVAL_LINE_ID))
+                .where(ApprovalShare.APPROVAL_SHARE.USE_YN.eq("Y")
+                        .and(ApprovalShareReaderView.APPROVAL_SHARE_READER_VIEW.USE_YN.eq("Y"))
+                        .and(ApprovalLine.APPROVAL_LINE.USE_YN.eq("Y"))
+                        .and(ApprovalLine.APPROVAL_LINE.APPROVAL_LINE_ID.eq(approvalLineId)))
+                .fetchInto(ApprovalShareReaderView.class);
