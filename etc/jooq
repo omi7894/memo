@@ -161,3 +161,38 @@ public class ApprovalLineOfDocumentRepositoryCustomImpl implements ApprovalLineO
                 .fetchInto(ApprovalLineAndSendReceiveQueryOutJooqDto.class);
     }
 }
+
+
+
+>>>>>
+
+
+
+@Override
+    public List<ApprovalLineAndSendReceiveQueryOutJooqDto> findApprovalDetailList() {
+        return dsl.select(
+                ApprovalLine.APPROVAL_LINE.APPROVAL_LINE_ID,
+                // ... (다른 필드들도 추가)
+                SendReceive.SEND_RECEIVE.REVIEW_COMPLETE_YN
+        )
+                .from(ApprovalLine.APPROVAL_LINE)
+                .leftJoin(SendReceive.SEND_RECEIVE)
+                .on(ApprovalLine.APPROVAL_LINE.RECEIVE_DEPARTMENT_EXIST_YN.eq("Y")
+                        .and(ApprovalLine.APPROVAL_LINE.APPROVAL_LINE_ID.eq(SendReceive.SEND_RECEIVE.SEND_APPROVAL_LINE_ID))
+                        .and(SendReceive.SEND_RECEIVE.USE_YN.eq("Y")))
+                .leftJoin(ApprovalShare.APPROVAL_SHARE)
+                .on(ApprovalLine.APPROVAL_LINE.APPROVAL_LINE_ID.eq(ApprovalShare.APPROVAL_SHARE.APPROVAL_LINE_ID)
+                        .and(ApprovalShare.APPROVAL_SHARE.USE_YN.eq("Y")))
+                .leftJoin(ApprovalShareReaderView.APPROVAL_SHARE_READER_VIEW)
+                .on(ApprovalShare.APPROVAL_SHARE.APPROVAL_SHARE_ID.eq(ApprovalShareReaderView.APPROVAL_SHARE_READER_VIEW.APPROVAL_SHARE_ID)
+                        .and(ApprovalShareReaderView.APPROVAL_SHARE_READER_VIEW.USE_YN.eq("Y")))
+                .leftJoin(ApprovalShareSharerView.APPROVAL_SHARE_SHARER_VIEW)
+                .on(ApprovalShare.APPROVAL_SHARE.APPROVAL_SHARE_ID.eq(ApprovalShareSharerView.APPROVAL_SHARE_SHARER_VIEW.APPROVAL_SHARE_ID)
+                        .and(ApprovalShareSharerView.APPROVAL_SHARE_SHARER_VIEW.USE_YN.eq("Y")))
+                .where(ApprovalLine.APPROVAL_LINE.USE_YN.eq("Y")
+                        .and(ApprovalShare.APPROVAL_SHARE.USE_YN.eq("Y"))
+                        .and(ApprovalShareReaderView.APPROVAL_SHARE_READER_VIEW.USE_YN.eq("Y"))
+                        // ... (다른 조건들도 추가)
+                )
+                .fetchInto(ApprovalLineAndSendReceiveQueryOutJooqDto.class);
+    }
