@@ -9,3 +9,17 @@
 list의 모든 데이터를 approvalShareReaderViewAggregate.createBpmReferenceUserQueryOutDtoByJooqDto() 메소드로 처리하여
 
 List<BpmReferenceUserQueryOutDto> 형태로 return하도록 해줘
+
+>>>>>>
+
+
+@Override
+public List<BpmReferenceUserQueryOutDto> findBpmReferenceUserList(BpmReferenceUserQueryInDto inDto) {
+    List<ReferenceUserQueryOutJooqDto> list = approvalShareReaderViewCustomRepository.findBpmReferenceUser(inDto.getApprovalLineId());
+
+    List<BpmReferenceUserQueryOutDto> resultList = list.stream()
+            .map(approvalShareReaderViewAggregate::createBpmReferenceUserQueryOutDtoByJooqDto)
+            .collect(Collectors.toList());
+
+    return resultList;
+}
