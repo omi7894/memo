@@ -86,7 +86,6 @@ CREATE TABLE "approval_share_reader_view" (
 
 여기서
 
-jpa로 구현된 아래의 것을 
 
 @Query("SELECT asrv FROM ApprovalShareReaderView asrv " +
             "JOIN ApprovalShare asr ON asrv.approvalShare.approvalShareId = asr.approvalShareId " +
@@ -96,43 +95,34 @@ jpa로 구현된 아래의 것을
     List<ApprovalShareReaderView> findBpmApprovalShareReaderViewByApprovalLineId(@Param("approvalLineId") String approvalLineId);
 
 
-jooq로 
+JPA로된 쿼리를 아래처럼 jooq로 바꿔줘
+
+
 @Repository
 @RequiredArgsConstructor
 @Slf4j
-public class ApprovalLineOfDocumentRepositoryCustomImpl implements ApprovalLineOfDocumentRepositoryCustom {
-
+public class ApprovalShareReaderViewCustomRepositoryImpl implements ApprovalShareReaderViewCustomRepository {
     private final DSLContext dsl;
     @Override
-    public List<ApprovalLineAndSendReceiveQueryOutJooqDto> findApprovalDetailList() {
+    public List<ReferenceUserQueryOutJooqDto> findBpmReferenceUser(String approvalLineId) {
         return dsl.select(
-            ApprovalLine.APPROVAL_LINE.APPROVAL_LINE_ID ,
-            ApprovalLine.APPROVAL_LINE.VERSION ,
-            ApprovalLine.APPROVAL_LINE.PROCESS_ID ,
-            ApprovalLine.APPROVAL_LINE.APPROVAL_LINE_TYPE_CODE,
-            ApprovalLine.APPROVAL_LINE.APPROVAL_PROCESS_STATUS_CODE,
-            ApprovalLine.APPROVAL_LINE.APPROVAL_DOCUMENT_STATUS_CODE,
-            ApprovalLine.APPROVAL_LINE.CURRENT_APPROVER_ORDER_NO,
-            ApprovalLine.APPROVAL_LINE.RECEIVE_DEPARTMENT_EXIST_YN,
-            ApprovalLine.APPROVAL_LINE.GLOBAL_APPROVAL_YN,
-            SendReceive.SEND_RECEIVE.SEND_RECEIVE_ID,
-            SendReceive.SEND_RECEIVE.RECEIVE_COMPANY_CODE,
-            SendReceive.SEND_RECEIVE.RECEIVE_COMPANY_NAME,
-            SendReceive.SEND_RECEIVE.RECEIVE_COMPANY_NAME_EN,
-            SendReceive.SEND_RECEIVE.RECEIVE_DEPARTMENT_CODE ,
-            SendReceive.SEND_RECEIVE.RECEIVE_DEPARTMENT_NAME ,
-            SendReceive.SEND_RECEIVE.RECEIVE_DEPARTMENT_NAME_EN ,
-            SendReceive.SEND_RECEIVE.RECEIVE_DATETIME ,
-            SendReceive.SEND_RECEIVE.REVIEW_COMPLETE_YN
-                ).from(ApprovalLine.APPROVAL_LINE)
-                    .leftJoin(SendReceive.SEND_RECEIVE)
-                    .on(ApprovalLine.APPROVAL_LINE.RECEIVE_DEPARTMENT_EXIST_YN.eq("Y"))
-                    .and(ApprovalLine.APPROVAL_LINE.APPROVAL_LINE_ID.eq(SendReceive.SEND_RECEIVE.SEND_APPROVAL_LINE_ID))
-                    .and(SendReceive.SEND_RECEIVE.USE_YN.eq("Y"))
-                .fetchInto(ApprovalLineAndSendReceiveQueryOutJooqDto.class);
+                        ApprovalShareReaderView.APPROVAL_SHARE_READER_VIEW.READER_ORDER_NO,
+                        // ... (다른 필드들 추가)
+                        ApprovalLine.APPROVAL_LINE.APPROVAL_LINE_ID // 추가 필드 예시
+                )
+                .from(ApprovalShareReaderView.APPROVAL_SHARE_READER_VIEW)
+                .join(ApprovalShare.APPROVAL_SHARE)
+                .on(ApprovalShareReaderView.APPROVAL_SHARE_READER_VIEW.APPROVAL_SHARE_ID.eq(ApprovalShare.APPROVAL_SHARE.APPROVAL_SHARE_ID)
+                        .and(ApprovalShare.APPROVAL_SHARE.USE_YN.eq("Y")))
+                .join(ApprovalLine.APPROVAL_LINE)
+                .on(ApprovalShare.APPROVAL_SHARE.APPROVAL_LINE_ID.eq(ApprovalLine.APPROVAL_LINE.APPROVAL_LINE_ID)
+                        .and(ApprovalLine.APPROVAL_LINE.USE_YN.eq("Y")))
+                .where(ApprovalShareReaderView.APPROVAL_SHARE_READER_VIEW.USE_YN.eq("Y")
+                        .and(ApprovalLine.APPROVAL_LINE.APPROVAL_LINE_ID.eq(approvalLineId)))
+                .fetchInto(ReferenceUserQueryOutJooqDto.class);
     }
-
 }
+
 
 
 이런식으로 구현해줘
