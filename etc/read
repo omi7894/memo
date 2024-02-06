@@ -208,3 +208,7 @@ updateBpmReferenceRead 메소드에서 ApprovalShareReaderViewRepository.updateR
 
 LocalDateTime readDatetime = LocalDateTime.parse(bpmReferenceReadUpdateCommandInDto.getReadDatetime(), DateTimeFormatter.ISO_DATE_TIME);
 
+>>>
+
+
+yyyyMMddHHmmss
