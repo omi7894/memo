@@ -101,4 +101,86 @@ public interface ApprovalShareReaderViewRepository extends JpaRepository<Approva
     int updateReadStatusByApprovalLineId(@Param("approvalLineId") String approvalLineId, @Param("readDatetime") LocalDateTime readDatetime);
 
 
+>>>
+
+
+@Transactional
+@Service
+@Slf4j
+@RequiredArgsConstructor
+public class ShareCommandServiceImpl implements ShareCommandService {
+
+    private final ApprovalLineRepository approvalLineRepository;
+    private final ApprovalShareRepository approvalShareRepository;
+    private final ApprovalShareAggregate approvalShareAggregate;
+    private final ApprovalShareReaderViewAggregate approvalShareReaderViewAggregate;
+    private final ApprovalShareSharerViewAggregate approvalShareSharerViewAggregate;
+    @Override
+    public ApprovalShareCreateCommandOutDto createShareEntities(ApprovalShareCreateCommandInDto createCommandInDto) {
+        log.info("=====================================createShareEntities=====================================");
+        // 결재선 실제로 존재하는 지 확인
+        ApprovalLine approvalLine = approvalLineRepository.findOneToOneFetchByApprovalLineIdAndUseYn(createCommandInDto.getApprovalLineId(), YesNo.Y)
+                .orElseThrow(() -> new NotFoundException("ApprovalLine"));
+
+        //이미 존재하는 공유 열람자인지 확인
+        createCommandInDto.getApprovalShareReaderList().forEach(readerDto -> {
+            if (!approvalShareRepository.findApprovalShareByApprovalLineIdAndReaderUserId(createCommandInDto.getApprovalLineId(), readerDto.getReaderId()).isEmpty()) {
+                throw new DuplicateException(readerDto.getReaderId());
+            }
+        });
+
+        // 결재 공유 열람자 화면 생성
+        List<ApprovalShareReaderView> approvalShareReaderViewList = createApprovalShareReaderViewList(createCommandInDto.getApprovalShareReaderList());
+        List<String> approvalShareReaderViewIdList = approvalShareReaderViewList.stream().map(ApprovalShareReaderView::getApprovalShareReaderViewId).collect(Collectors.toList());
+
+        // 결재 공유 공유자 화면 생성
+        ApprovalShareSharerView approvalShareSharerView = createApprovalShareSharerView(createCommandInDto.getApprovalShareSharer());
+
+        // 결재 공유 생성
+        ApprovalShare approvalShare = createApprovalShare(createCommandInDto.getParentApprovalLineId(), approvalShareReaderViewList, approvalShareSharerView, approvalLine);
+
+        return ApprovalShareCreateCommandOutDto.builder()
+                .approvalShareId(approvalShare.getApprovalShareId())
+                .approvalShareSharerViewId(approvalShareSharerView.getApprovalShareSharerViewId())
+                .approvalShareReaderViewIdList(approvalShareReaderViewIdList)
+                .build();
+    }
+
+    @Override
+    public ApprovalShare createApprovalShare(String parentApprovalLineId, List<ApprovalShareReaderView> approvalShareReaderViewList, ApprovalShareSharerView approvalShareSharerView, ApprovalLine approvalLine) {
+        ApprovalShareCreateCommandInLogicDto logicDto = ApprovalShareCreateCommandInLogicDto.builder()
+                .parentApprovalLineId(parentApprovalLineId)
+                .build();
+        return approvalShareAggregate.insertApprovalShareEntityInApprovalShare(logicDto, approvalShareSharerView, approvalShareReaderViewList, approvalLine);
+    }
+
+    @Override
+    public ApprovalShareSharerView createApprovalShareSharerView(ApprovalShareSharerCreateCommandInDto inDto) {
+        if(ObjectUtils.isEmpty(inDto))
+            return null;
+        ApprovalShareSharerCreateCommandInLogicDto logicDto = ApprovalShareSharerCreateCommandInLogicDto.createApprovalShareSharerCreateCommandInLogicDto();
+        return approvalShareSharerViewAggregate.insertApprovalShareReaderViewEntityInApprovalShare(inDto, logicDto);
+    }
+
+    @Override
+    public List<ApprovalShareReaderView> createApprovalShareReaderViewList(List<ApprovalShareReaderCreateCommandInDto> approvalShareReaderDtoList) {
+        if(CollectionUtils.isEmpty(approvalShareReaderDtoList))
+            return new ArrayList<>();
+        return approvalShareReaderDtoList.stream().map(this::createApprovalShareReaderView).collect(Collectors.toList());
+    }
+
+    @Override
+    public ApprovalShareReaderView createApprovalShareReaderView(ApprovalShareReaderCreateCommandInDto inDto) {
+        ApprovalShareReaderCreateCommandInLogicDto logicDto = ApprovalShareReaderCreateCommandInLogicDto.createApprovalShareReaderCreateCommandInLogicDto();
+        return approvalShareReaderViewAggregate.insertApprovalShareReaderViewEntityInApprovalShare(inDto, logicDto);
+    }
+
+    @Override
+    public void updateBpmReferenceRead(BpmReferenceReadUpdateCommandInDto bpmReferenceReadUpdateCommandInDto) {
+
+    }
+
+
+}
+updateBpmReferenceRead 메소드에서 ApprovalShareReaderViewRepository.updateReadStatusByApprovalLineId를 사용할게
 
