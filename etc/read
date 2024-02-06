@@ -212,3 +212,8 @@ LocalDateTime readDatetime = LocalDateTime.parse(bpmReferenceReadUpdateCommandIn
 
 
 yyyyMMddHHmmss
+
+>>>>
+
+DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+    LocalDateTime readDatetime = LocalDateTime.parse(bpmReferenceReadUpdateCommandInDto.getReadDatetime(), formatter);
