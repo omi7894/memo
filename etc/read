@@ -90,5 +90,15 @@ public interface ApprovalShareReaderViewRepository extends JpaRepository<Approva
 여기에 구현해줘
 
 
+>>>>>>
+@Modifying
+    @Query("update ApprovalShareReaderView asrv set asrv.readYn = 'Y', asrv.readDatetime = :readDatetime " +
+            "where asrv.approvalShare.approvalShareId in " +
+            "(select asr.approvalShareId from ApprovalShare asr " +
+            "where asr.useYn = 'Y' and asr.approvalLine.approvalLineId = :approvalLineId " +
+            "and (asr.approvalLine.approvalLineId = :approvalLineId or asr.parentApprovalLine.approvalLineId = :approvalLineId)) " +
+            "and asrv.useYn = 'Y'")
+    int updateReadStatusByApprovalLineId(@Param("approvalLineId") String approvalLineId, @Param("readDatetime") LocalDateTime readDatetime);
+
 
 
