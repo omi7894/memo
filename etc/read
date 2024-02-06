@@ -202,3 +202,9 @@ updateBpmReferenceRead 메소드에서 ApprovalShareReaderViewRepository.updateR
         log.info("Updated {} rows in ApprovalShareReaderView table.", updatedRows);
     }
 
+
+>>>
+
+
+LocalDateTime readDatetime = LocalDateTime.parse(bpmReferenceReadUpdateCommandInDto.getReadDatetime(), DateTimeFormatter.ISO_DATE_TIME);
+
