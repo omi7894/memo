@@ -126,3 +126,24 @@ public class ApprovalShareReaderViewCustomRepositoryImpl implements ApprovalShar
 
 
 이런식으로 구현해줘
+
+>>>>>
+
+
+ Result<ReferenceUserQueryOutJooqDto> result = dsl.select(
+                ApprovalShareReaderView.APPROVAL_SHARE_READER_VIEW.READER_ORDER_NO,
+                // ... (add other fields)
+                ApprovalLine.APPROVAL_LINE.APPROVAL_LINE_ID // additional field example
+        )
+                .from(ApprovalShareReaderView.APPROVAL_SHARE_READER_VIEW)
+                .join(ApprovalShare.APPROVAL_SHARE)
+                .on(ApprovalShareReaderView.APPROVAL_SHARE_READER_VIEW.APPROVAL_SHARE_ID.eq(ApprovalShare.APPROVAL_SHARE.APPROVAL_SHARE_ID)
+                        .and(ApprovalShare.APPROVAL_SHARE.USE_YN.eq("Y")))
+                .join(ApprovalLine.APPROVAL_LINE)
+                .on(ApprovalShare.APPROVAL_SHARE.APPROVAL_LINE_ID.eq(ApprovalLine.APPROVAL_LINE.APPROVAL_LINE_ID)
+                        .and(ApprovalLine.APPROVAL_LINE.USE_YN.eq("Y")))
+                .where(ApprovalShareReaderView.APPROVAL_SHARE_READER_VIEW.USE_YN.eq("Y")
+                        .and(ApprovalLine.APPROVAL_LINE.APPROVAL_LINE_ID.eq(approvalLineId)))
+                .fetchInto(ReferenceUserQueryOutJooqDto.class);
+
+        return result;
