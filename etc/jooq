@@ -84,89 +84,55 @@ CREATE TABLE "approval_share_reader_view" (
   PRIMARY KEY ("APPROVAL_SHARE_READER_VIEW_ID")
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='결재 공유 열람자 화면';
 
-CREATE TABLE "approval_share_sharer_view" (
-  "APPROVAL_SHARE_SHARER_VIEW_ID" varchar(40) NOT NULL COMMENT '결재 공유 공유자 화면 ID',
-  "APPROVAL_SHARE_ID" varchar(40) NOT NULL COMMENT '결재 공유 ID',
-  "APPROVAL_SHARE_TYPE_CODE" varchar(20) DEFAULT NULL COMMENT '공유 유형 코드',
-  "SHARER_TYPE_CODE" varchar(20) DEFAULT NULL COMMENT '공유자 유형 코드',
-  "SHARER_ID" varchar(20) DEFAULT NULL COMMENT '공유자 ID',
-  "SHARER_NAME" varchar(100) DEFAULT NULL COMMENT '공유자 이름',
-  "SHARER_NAME_EN" varchar(100) DEFAULT NULL COMMENT '공유자 이름 영문',
-  "SHARER_USER_ID" varchar(20) DEFAULT NULL COMMENT '공유자 사용자 ID',
-  "SHARER_USER_NAME" varchar(100) DEFAULT NULL COMMENT '공유자 사용자 이름',
-  "SHARER_USER_NAME_EN" varchar(100) DEFAULT NULL COMMENT '공유자 사용자 이름 영문',
-  "SHARER_DEPARTMENT_CODE" varchar(50) DEFAULT NULL COMMENT '공유자 부서 코드',
-  "SHARER_DEPARTMENT_NAME" varchar(200) DEFAULT NULL COMMENT '공유자 부서 이름',
-  "SHARER_DEPARTMENT_NAME_EN" varchar(200) DEFAULT NULL COMMENT '공유자 부서 이름 영문',
-  "SHARER_COMPANY_CODE" varchar(20) DEFAULT NULL COMMENT '공유자 회사 코드',
-  "SHARER_COMPANY_NAME" varchar(100) DEFAULT NULL COMMENT '공유자 회사 이름',
-  "SHARER_COMPANY_NAME_EN" varchar(100) DEFAULT NULL COMMENT '공유자 회사 이름 영문',
-  "SHARER_DUTY_CODE" varchar(20) DEFAULT NULL COMMENT '공유자 보직 코드',
-  "SHARER_DUTY_NAME" varchar(100) DEFAULT NULL COMMENT '공유자 보직 이름',
-  "SHARER_DUTY_NAME_EN" varchar(100) DEFAULT NULL COMMENT '공유자 보직 이름 영문',
-  "SHARER_JOB_POSITION_CODE" varchar(20) DEFAULT NULL COMMENT '공유자 직위 코드',
-  "SHARER_JOB_POSITION_NAME" varchar(100) DEFAULT NULL COMMENT '공유자 직위 이름',
-  "SHARER_JOB_POSITION_NAME_EN" varchar(100) DEFAULT NULL COMMENT '공유자 직위 이름 영문',
-  "SHARER_ROLE_CODE" varchar(20) DEFAULT NULL COMMENT '공유자 롤 코드',
-  "SHARER_ROLE_NAME" varchar(100) DEFAULT NULL COMMENT '공유자 롤 이름',
-  "SHARER_ROLE_NAME_EN" varchar(100) DEFAULT NULL COMMENT '공유자 롤 이름 영문',
-  "SHARE_DATETIME" timestamp NULL DEFAULT NULL COMMENT '공유 일시',
-  "CREATOR_ID" varchar(20) NOT NULL COMMENT '생성자 ID',
-  "CREATE_DATETIME" timestamp NOT NULL COMMENT '생성 일시',
-  "MODIFIER_ID" varchar(20) NOT NULL COMMENT '수정자 ID',
-  "MODIFY_DATETIME" timestamp NOT NULL COMMENT '수정 일시',
-  PRIMARY KEY ("APPROVAL_SHARE_SHARER_VIEW_ID")
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='결재 공유 공유자 화면';
+여기서
+
+jpa로 구현된 아래의 것을 
+
+@Query("SELECT asrv FROM ApprovalShareReaderView asrv " +
+            "JOIN ApprovalShare asr ON asrv.approvalShare.approvalShareId = asr.approvalShareId " +
+            "JOIN ApprovalLine al ON asr.approvalLine.approvalLineId = al.approvalLineId " +
+            "WHERE asr.useYn = 'Y' AND asrv.useYn = 'Y' AND al.useYn = 'Y' " +
+            "AND al.approvalLineId = :approvalLineId ")
+    List<ApprovalShareReaderView> findBpmApprovalShareReaderViewByApprovalLineId(@Param("approvalLineId") String approvalLineId);
 
 
-approval_line과 approval_share테이블을 approval_line_Id로 조인하고,
-approval_share과 approval_share_reader_view을 APPROVAL_SHARE_ID로 조인하고,
-approval_share과 approval_share_sharer_view를 APPROVAL_SHARE_ID로 조인해주고
-where 조건절에 approval_line.use_yn = 'Y'와 approval_share.use_yn = 'Y'와 approval_share_reader_view.use_yn = 'Y'를 넣어줘
-
-이것을 아래와 같이 jooq로 구현해줘
-
+jooq로 
 @Repository
 @RequiredArgsConstructor
 @Slf4j
-public class ApprovalShareReaderViewCustomRepositoryImpl implements ApprovalShareReaderViewCustomRepository {
+public class ApprovalLineOfDocumentRepositoryCustomImpl implements ApprovalLineOfDocumentRepositoryCustom {
+
     private final DSLContext dsl;
     @Override
-    public List<ReferenceUserQueryOutJooqDto> findBpmReferenceUser(String approvalLineId) {
+    public List<ApprovalLineAndSendReceiveQueryOutJooqDto> findApprovalDetailList() {
         return dsl.select(
-                ApprovalShareReaderView.APPROVAL_SHARE_READER_VIEW.APPROVAL_SHARE_ID
-                )
-                .from(ApprovalShareReaderView.APPROVAL_SHARE_READER_VIEW)
-                .join(ApprovalShare.APPROVAL_SHARE).on(ApprovalShareReaderView.APPROVAL_SHARE_READER_VIEW.APPROVAL_SHARE_ID.eq(ApprovalShare.APPROVAL_SHARE.APPROVAL_SHARE_ID))
-                .join(ApprovalLine.APPROVAL_LINE).on(ApprovalShare.APPROVAL_SHARE.APPROVAL_LINE_ID.eq(ApprovalLine.APPROVAL_LINE.APPROVAL_LINE_ID))
-                .where(ApprovalShare.APPROVAL_SHARE.USE_YN.eq("Y")
-                        .and(ApprovalShareReaderView.APPROVAL_SHARE_READER_VIEW.USE_YN.eq("Y"))
-                        .and(ApprovalLine.APPROVAL_LINE.USE_YN.eq("Y"))
-                        .and(ApprovalLine.APPROVAL_LINE.APPROVAL_LINE_ID.eq(approvalLineId)))
-                .fetchInto(ReferenceUserQueryOutJooqDto.class);
+            ApprovalLine.APPROVAL_LINE.APPROVAL_LINE_ID ,
+            ApprovalLine.APPROVAL_LINE.VERSION ,
+            ApprovalLine.APPROVAL_LINE.PROCESS_ID ,
+            ApprovalLine.APPROVAL_LINE.APPROVAL_LINE_TYPE_CODE,
+            ApprovalLine.APPROVAL_LINE.APPROVAL_PROCESS_STATUS_CODE,
+            ApprovalLine.APPROVAL_LINE.APPROVAL_DOCUMENT_STATUS_CODE,
+            ApprovalLine.APPROVAL_LINE.CURRENT_APPROVER_ORDER_NO,
+            ApprovalLine.APPROVAL_LINE.RECEIVE_DEPARTMENT_EXIST_YN,
+            ApprovalLine.APPROVAL_LINE.GLOBAL_APPROVAL_YN,
+            SendReceive.SEND_RECEIVE.SEND_RECEIVE_ID,
+            SendReceive.SEND_RECEIVE.RECEIVE_COMPANY_CODE,
+            SendReceive.SEND_RECEIVE.RECEIVE_COMPANY_NAME,
+            SendReceive.SEND_RECEIVE.RECEIVE_COMPANY_NAME_EN,
+            SendReceive.SEND_RECEIVE.RECEIVE_DEPARTMENT_CODE ,
+            SendReceive.SEND_RECEIVE.RECEIVE_DEPARTMENT_NAME ,
+            SendReceive.SEND_RECEIVE.RECEIVE_DEPARTMENT_NAME_EN ,
+            SendReceive.SEND_RECEIVE.RECEIVE_DATETIME ,
+            SendReceive.SEND_RECEIVE.REVIEW_COMPLETE_YN
+                ).from(ApprovalLine.APPROVAL_LINE)
+                    .leftJoin(SendReceive.SEND_RECEIVE)
+                    .on(ApprovalLine.APPROVAL_LINE.RECEIVE_DEPARTMENT_EXIST_YN.eq("Y"))
+                    .and(ApprovalLine.APPROVAL_LINE.APPROVAL_LINE_ID.eq(SendReceive.SEND_RECEIVE.SEND_APPROVAL_LINE_ID))
+                    .and(SendReceive.SEND_RECEIVE.USE_YN.eq("Y"))
+                .fetchInto(ApprovalLineAndSendReceiveQueryOutJooqDto.class);
     }
+
 }
 
 
->>>>>>>
-
-
-
- @Override
-    public List<ReferenceUserQueryOutJooqDto> findBpmReferenceUser(String approvalLineId) {
-        return dsl.select(
-                ApprovalShareReaderView.APPROVAL_SHARE_READER_VIEW.READER_ORDER_NO,
-                // ... (다른 필드들 추가)
-                ApprovalLine.APPROVAL_LINE.APPOVAL_LINE_ID // 추가 필드 예시
-            )
-            .from(ApprovalShareReaderView.APPROVAL_SHARE_READER_VIEW)
-            .join(ApprovalShare.APPROVAL_SHARE)
-            .on(ApprovalShareReaderView.APPROVAL_SHARE_READER_VIEW.APPROVAL_SHARE_ID.eq(ApprovalShare.APPROVAL_SHARE.APPROVAL_SHARE_ID)
-                    .and(ApprovalShare.APPROVAL_SHARE.USE_YN.eq("Y")))
-            .join(ApprovalLine.APPROVAL_LINE)
-            .on(ApprovalShare.APPROVAL_SHARE.APPROVAL_LINE_ID.eq(ApprovalLine.APPROVAL_LINE.APPOVAL_LINE_ID)
-                    .and(ApprovalLine.APPROVAL_LINE.USE_YN.eq("Y")))
-            .where(ApprovalShareReaderView.APPROVAL_SHARE_READER_VIEW.USE_YN.eq("Y")
-                    .and(ApprovalLine.APPROVAL_LINE.APPROVAL_LINE_ID.eq(approvalLineId)))
-            .fetchInto(ReferenceUserQueryOutJooqDto.class);
-    }
+이런식으로 구현해줘
