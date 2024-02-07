@@ -1,7 +1,0 @@
-DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
-        LocalDateTime fromLocalDateTime = inDto.getConditionDateFrom() != null
-                ? LocalDateTime.parse(inDto.getConditionDateFrom(), formatter)
-                : null;
-        LocalDateTime toLocalDateTime = inDto.getConditionDateTo() != null
-                ? LocalDateTime.parse(inDto.getConditionDateTo(), formatter)
-                : null;
