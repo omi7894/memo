@@ -44,3 +44,9 @@ CREATE TABLE "approval_share_reader_view" (
 List<ApprovalShare> findExistApprovalShareReader(@Param("readerUserIdList") String readerIdList);
 
 이 코드를 사용해서 jooq와 @Query를 사용해서 @Query()를 채워줘
+
+
+>>>
+
+@Query("SELECT * FROM approval_share_reader_view WHERE READER_ID IN (:readerUserIdList)")
+    List<ApprovalShare> findExistApprovalShareReader(@Param("readerUserIdList") List<String> readerIdList);
