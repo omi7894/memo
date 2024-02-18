@@ -74,3 +74,7 @@ public class ApprovalShareReaderCreateCommandInDto {
     }
 
 위의 메소드 안에 createCommandInDto 의 approvalShareReaderList를 가져와서 readerId로 List<String> 변수를 만드는 로직을 코딩해줘
+
+List<String> readerIds = createCommandInDto.getApprovalShareReaderList().stream()
+            .map(ApprovalShareReaderCreateCommandInDto::getReaderId)
+            .collect(Collectors.toList());
