@@ -1,1 +1,76 @@
+public class ApprovalShareCreateCommandInDto {
+    @NotBlank @Size(max = 40)
+    private String approvalLineId;
+    @Size(max = 40)
+    private String parentApprovalLineId;
+    @Valid @NotNull
+    private ApprovalShareSharerCreateCommandInDto approvalShareSharer;
+    @Valid @NotEmpty
+    private List<ApprovalShareReaderCreateCommandInDto> approvalShareReaderList;
+}
 
+public class ApprovalShareReaderCreateCommandInDto {
+    private int readerOrderNo;
+    @ValidEnum(enumClass = ApprovalShareType.class)
+    private ApprovalShareType approvalShareTypeCode;
+    @ValidEnum(enumClass = ReaderType.class)
+    private ReaderType readerTypeCode;
+    @Size(max = 50)
+    private String readerId;
+    @Size(max = 100)
+    private String readerName;
+    @Size(max = 100)
+    private String readerNameEn;
+    @Size(max = 20)
+    private String readerUserId;
+    @Size(max = 100)
+    private String readerUserName;
+    @Size(max = 100)
+    private String readerUserNameEn;
+    @Size(max = 50)
+    private String readerDepartmentCode;
+    @Size(max = 100)
+    private String readerDepartmentName;
+    @Size(max = 100)
+    private String readerDepartmentNameEn;
+    @Size(max = 20)
+    private String readerCompanyCode;
+    @Size(max = 100)
+    private String readerCompanyName;
+    @Size(max = 100)
+    private String readerCompanyNameEn;
+    @Size(max = 20)
+    private String readerDutyCode;
+    @Size(max = 100)
+    private String readerDutyName;
+    @Size(max = 100)
+    private String readerDutyNameEn;
+    @Size(max = 20)
+    private String readerJobPositionCode;
+    @Size(max = 100)
+    private String readerJobPositionName;
+    @Size(max = 100)
+    private String readerJobPositionNameEn;
+    @Size(max = 20)
+    private String readerRoleCode;
+    @Size(max = 100)
+    private String readerRoleName;
+    @Size(max = 100)
+    private String readerRoleNameEn;
+    @ValidEnum(enumClass = ReadPhaseType.class)
+    private ReadPhaseType readPhaseTypeCode;
+    @ValidEnum(enumClass = YesNo.class)
+    private YesNo displayYn;
+  private YesNo useYn;
+}
+
+두 DTO를 참고해서
+
+
+    @Override
+    public ApprovalShareCreateCommandOutDto createShareEntities(ApprovalShareCreateCommandInDto createCommandInDto) {
+
+
+    }
+
+위의 메소드 안에 createCommandInDto 의 approvalShareReaderList를 가져와서 readerId로 List<String> 변수를 만드는 로직을 코딩해줘
