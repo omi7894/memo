@@ -1,14 +1,6 @@
-String dateString = "20240207";
-
-        // DateTimeFormatter를 이용하여 문자열을 LocalDateTime으로 변환한다.
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
-
-        try {
-            LocalDateTime localDateTime = LocalDateTime.parse(dateString, formatter);
-
-            // 변환된 LocalDateTime 출력
-            System.out.println("LocalDateTime: " + localDateTime);
-        } catch (DateTimeParseException e) {
-            System.out.println("날짜 형식이 올바르지 않습니다. 정확한 형식으로 입력하세요.");
-            e.printStackTrace();
-        }
+"select asrv from ApprovalShareReaderView asrv " +
+            "join ApprovalShare asr on asrv.approvalShare.approvalShareId = asr.approvalShareId " +
+            "where asr.useYn = 'Y' and asrv.useYn = 'Y' " +
+            "and asr.approvalLine.approvalLineId = :approvalLineId " +
+            "and asrv.readerTypeCode = :readerType " +
+            "and asrv.displayYn = :displayYn "
