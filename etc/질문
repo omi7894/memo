@@ -1,0 +1,2 @@
+@OneToOne(fetch = FetchType.LAZY)
+무슨뜻이야?
