@@ -54,4 +54,11 @@ CREATE TABLE `approval_share_reader_view` (
   PRIMARY KEY (`APPROVAL_SHARE_READER_VIEW_ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='결재 공유 열람자 화면';
 
-두 테이블을 APPROVAL_SHARE_ID로 join 했을때, APPROVAL_LINE_ID 가 "param"인 approval_share_reader_view 데이터를 USE_YN="N"으로 바꿔줘
+두 테이블을 APPROVAL_SHARE_ID로 join 했을때, APPROVAL_LINE_ID 가 "param"인 approval_share_reader_view 데이터를 USE_YN="N"으로 바꾸는 쿼리를 짜줘
+
+
+
+UPDATE approval_share_reader_view AS arv
+JOIN approval_share AS asv ON arv.APPROVAL_SHARE_ID = asv.APPROVAL_SHARE_ID
+SET arv.USE_YN = 'N'
+WHERE asv.APPROVAL_LINE_ID = 'param';
