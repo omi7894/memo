@@ -3,3 +3,5 @@ for(ApprovalShareReaderView reader : readerList){
 }
 
 이 코드를 더 간단하게 바꿔줘
+
+readerList.forEach(approvalShareReaderViewAggregate::deleteApprovalShareReaderView);
