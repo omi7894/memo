@@ -65,3 +65,41 @@ public class ApprovalShareDeleteCommandOutDto {
     private List<String> approvalShareReaderViewIdList;
 
 }
+
+setApprovalShare 함수안에서 outDtoList에 데이터를 add하여 return하고 싶어.
+createOutDto의 approvalShareReaderViewIdList를 가져와서 outDto의 ApprovalShareReaderId에 넣고, commandType은 'CREATE'로 하고싶어
+deleteOutDto의 approvalShareReaderViewIdList를 가져와서 outDto의 ApprovalShareReaderId에 넣고, commandType은 'DELETE'로 하고싶어
+
+
+createOutDto의 approvalShareReaderViewIdList와 deleteOutDto의 approvalShareReaderViewIdList 의 String 객체를 각각 가져와서 outDto에 전부 넣고싶어
+
+반복을 통해 approvalShareReaderViewIdList의 모든 string객체를 일일히 outDtoList에 추가하고싶어
+
+// Add all approvalShareReaderViewId from deleteOutDto
+    for (String id : deleteOutDto.getApprovalShareReaderViewIdList()) {
+        SetApprovalShareOutDto dto = new SetApprovalShareOutDto();
+        dto.setCommandType(CommandType.DELETE);
+        dto.setApprovalShareReaderId(id);
+        outDtoList.add(dto);
+    }
+
+이부분을 더 간단하게 해줘
+
+
+
+--
+
+// Add all approvalShareReaderViewId from deleteOutDto
+deleteOutDto.getApprovalShareReaderViewIdList().forEach(id ->
+    outDtoList.add(new SetApprovalShareOutDto.Builder()
+                    .commandType(CommandType.DELETE)
+                    .approvalShareReaderId(id)
+                    .build()));
+
+// Add all approvalShareReaderViewId from createOutDto
+createOutDto.getApprovalShareReaderViewIdList().forEach(id ->
+    outDtoList.add(new SetApprovalShareOutDto.Builder()
+                    .commandType(CommandType.CREATE)
+                    .approvalShareReaderId(id)
+                    .build()));
+
