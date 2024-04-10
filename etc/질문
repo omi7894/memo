@@ -47,3 +47,21 @@ public class SetApprovalShareOutDto {
     private CommandType commandType;
     private String ApprovalShareReaderId;
 }
+
+public class ApprovalShareCreateCommandOutDto {
+
+    @Schema(description = "결재 공유 아이디", required = true)
+    private String approvalShareId;
+
+    @Schema(description = "결재 공유 공유자 화면 아이디", required = true)
+    private String approvalShareSharerViewId;
+
+    @Schema(description = "결재 공유 열람자 화면 아이디", required = true)
+    private List<String> approvalShareReaderViewIdList;
+}
+
+public class ApprovalShareDeleteCommandOutDto {
+    @Schema(description = "결재 공유 열람자 화면 아이디", required = true)
+    private List<String> approvalShareReaderViewIdList;
+
+}
