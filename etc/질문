@@ -1,7 +1,49 @@
-for(ApprovalShareReaderView reader : readerList){
-            approvalShareReaderViewAggregate.deleteApprovalShareReaderView(reader);
+public List<SetApprovalShareOutDto> setApprovalShare(SetApprovalShareListInDto shareInDto) {
+        List<SetApprovalShareReaderInDto> inDtoList = shareInDto.getSetApprovalShareReaderInDtoList();
+        List<SetApprovalShareOutDto> outDtoList = new ArrayList<>();
+        List<SetApprovalShareReaderInDto> createDtoList = new ArrayList<>();
+        List<String> deleteReaderIdList = new ArrayList<>();
+
+        for(SetApprovalShareReaderInDto inDto : inDtoList){
+            switch (inDto.getCommandType()){
+                case CREATE:
+                    createDtoList.add(inDto);
+                    break;
+                case DELETE:
+                    deleteReaderIdList.add(inDto.getApprovalShareReaderViewId());
+                    break;
+                default:
+                    throw new NotFoundException("CommandType");
+            }
+        }
+
+        // 참조 추가 - createShareEntityList
+        if(!createDtoList.isEmpty()){
+            List<ApprovalShareReaderCreateCommandInDto> createCommandInDtoList = approvalShareReaderViewMapper.setDtoListToCreateDtoList(createDtoList);
+            ApprovalShareCreateCommandOutDto createOutDto = createShareEntityList(ApprovalShareCreateCommandInDto.builder()
+                    .approvalLineId(shareInDto.getApprovalLineId())
+                    .parentApprovalLineId(shareInDto.getParentApprovalLineId())
+                    .approvalShareSharer(shareInDto.getApprovalShareSharer())
+                    .approvalShareReaderList(createCommandInDtoList)
+                    .build()
+            );
+        }
+
+        // 참조 삭제 - deleteShareEntityList
+        if(!deleteReaderIdList.isEmpty()){
+            ApprovalShareDeleteCommandOutDto deleteOutDto = deleteShareEntityList(ApprovalShareDeleteCommandInDto.builder()
+                    .approvalShareReaderViewIdList(deleteReaderIdList)
+                    .build()
+            );
+        }
+
+        return outDtoList;
+    }
+
+
+
+
+public class SetApprovalShareOutDto {
+    private CommandType commandType;
+    private String ApprovalShareReaderId;
 }
-
-이 코드를 더 간단하게 바꿔줘
-
-readerList.forEach(approvalShareReaderViewAggregate::deleteApprovalShareReaderView);
