@@ -103,3 +103,26 @@ createOutDto.getApprovalShareReaderViewIdList().forEach(id ->
                     .approvalShareReaderId(id)
                     .build()));
 
+여기서 stream을 쓰는 방법은?
+
+
+
+// Add all approvalShareReaderViewId from deleteOutDto
+List<SetApprovalShareOutDto> deleteOutDtoList = deleteOutDto.getApprovalShareReaderViewIdList().stream()
+        .map(id -> new SetApprovalShareOutDto.Builder()
+                .commandType(CommandType.DELETE)
+                .approvalShareReaderId(id)
+                .build())
+        .collect(Collectors.toList());
+
+// Add all approvalShareReaderViewId from createOutDto
+List<SetApprovalShareOutDto> createOutDtoList = createOutDto.getApprovalShareReaderViewIdList().stream()
+        .map(id -> new SetApprovalShareOutDto.Builder()
+                .commandType(CommandType.CREATE)
+                .approvalShareReaderId(id)
+                .build())
+        .collect(Collectors.toList());
+
+// Add all elements to outDtoList
+outDtoList.addAll(deleteOutDtoList);
+outDtoList.addAll(createOutDtoList);
