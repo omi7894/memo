@@ -1,128 +1,41 @@
-public List<SetApprovalShareOutDto> setApprovalShare(SetApprovalShareListInDto shareInDto) {
-        List<SetApprovalShareReaderInDto> inDtoList = shareInDto.getSetApprovalShareReaderInDtoList();
-        List<SetApprovalShareOutDto> outDtoList = new ArrayList<>();
-        List<SetApprovalShareReaderInDto> createDtoList = new ArrayList<>();
-        List<String> deleteReaderIdList = new ArrayList<>();
-
-        for(SetApprovalShareReaderInDto inDto : inDtoList){
-            switch (inDto.getCommandType()){
-                case CREATE:
-                    createDtoList.add(inDto);
-                    break;
-                case DELETE:
-                    deleteReaderIdList.add(inDto.getApprovalShareReaderViewId());
-                    break;
-                default:
-                    throw new NotFoundException("CommandType");
-            }
+List<ApprovalShareReaderView> deleteList = approvalShareReaderViewRepository.findByApprovalShareReaderViewIdInAndUseYn(approvalShareReaderViewIdList, YesNo.Y);
+        if(approvalShareReaderViewIdList.size() != deleteList.size()){
+            throw new NotFoundException("ApprovalShareReaderView");
         }
 
-        // 참조 추가 - createShareEntityList
-        if(!createDtoList.isEmpty()){
-            List<ApprovalShareReaderCreateCommandInDto> createCommandInDtoList = approvalShareReaderViewMapper.setDtoListToCreateDtoList(createDtoList);
-            ApprovalShareCreateCommandOutDto createOutDto = createShareEntityList(ApprovalShareCreateCommandInDto.builder()
-                    .approvalLineId(shareInDto.getApprovalLineId())
-                    .parentApprovalLineId(shareInDto.getParentApprovalLineId())
-                    .approvalShareSharer(shareInDto.getApprovalShareSharer())
-                    .approvalShareReaderList(createCommandInDtoList)
-                    .build()
-            );
-        }
 
-        // 참조 삭제 - deleteShareEntityList
-        if(!deleteReaderIdList.isEmpty()){
-            ApprovalShareDeleteCommandOutDto deleteOutDto = deleteShareEntityList(ApprovalShareDeleteCommandInDto.builder()
-                    .approvalShareReaderViewIdList(deleteReaderIdList)
-                    .build()
-            );
-        }
+public class ApprovalShareReaderView extends BaseEntity implements Persistable<String> {
 
-        return outDtoList;
-    }
+    @Id
+    @Column(name = "APPROVAL_SHARE_READER_VIEW_ID")
+    @Builder.Default
+    private String approvalShareReaderViewId = CommonUtils.getUUID();
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "APPROVAL_SHARE_ID")
+    private ApprovalShare approvalShare;
+    
+    @Column(name = "READER_ORDER_NO")
+    private int readerOrderNo;
+    
+    @Enumerated(EnumType.STRING)
+    @Column(name = "READ_YN")
+    @Builder.Default
+    private YesNo readYn = YesNo.N;
+    
+    @Column(name = "SHARE_DATETIME")
+    @Convert(converter = LocalDateTimeConverter.class)
+    private LocalDateTime shareDatetime;
 
+    @Column(name = "READ_DATETIME")
+    @Convert(converter = LocalDateTimeConverter.class)
+    private LocalDateTime readDatetime;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "APPROVAL_SHARE_TYPE_CODE")
+    private ApprovalShareType approvalShareTypeCode;
 
-
-public class SetApprovalShareOutDto {
-    private CommandType commandType;
-    private String ApprovalShareReaderId;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "APPROVAL_SHARE_DETAIL_TYPE_CODE")
+    private ApprovalShareDetailType approvalShareDetailTypeCode;
 }
-
-public class ApprovalShareCreateCommandOutDto {
-
-    @Schema(description = "결재 공유 아이디", required = true)
-    private String approvalShareId;
-
-    @Schema(description = "결재 공유 공유자 화면 아이디", required = true)
-    private String approvalShareSharerViewId;
-
-    @Schema(description = "결재 공유 열람자 화면 아이디", required = true)
-    private List<String> approvalShareReaderViewIdList;
-}
-
-public class ApprovalShareDeleteCommandOutDto {
-    @Schema(description = "결재 공유 열람자 화면 아이디", required = true)
-    private List<String> approvalShareReaderViewIdList;
-
-}
-
-setApprovalShare 함수안에서 outDtoList에 데이터를 add하여 return하고 싶어.
-createOutDto의 approvalShareReaderViewIdList를 가져와서 outDto의 ApprovalShareReaderId에 넣고, commandType은 'CREATE'로 하고싶어
-deleteOutDto의 approvalShareReaderViewIdList를 가져와서 outDto의 ApprovalShareReaderId에 넣고, commandType은 'DELETE'로 하고싶어
-
-
-createOutDto의 approvalShareReaderViewIdList와 deleteOutDto의 approvalShareReaderViewIdList 의 String 객체를 각각 가져와서 outDto에 전부 넣고싶어
-
-반복을 통해 approvalShareReaderViewIdList의 모든 string객체를 일일히 outDtoList에 추가하고싶어
-
-// Add all approvalShareReaderViewId from deleteOutDto
-    for (String id : deleteOutDto.getApprovalShareReaderViewIdList()) {
-        SetApprovalShareOutDto dto = new SetApprovalShareOutDto();
-        dto.setCommandType(CommandType.DELETE);
-        dto.setApprovalShareReaderId(id);
-        outDtoList.add(dto);
-    }
-
-이부분을 더 간단하게 해줘
-
-
-
---
-
-// Add all approvalShareReaderViewId from deleteOutDto
-deleteOutDto.getApprovalShareReaderViewIdList().forEach(id ->
-    outDtoList.add(new SetApprovalShareOutDto.Builder()
-                    .commandType(CommandType.DELETE)
-                    .approvalShareReaderId(id)
-                    .build()));
-
-// Add all approvalShareReaderViewId from createOutDto
-createOutDto.getApprovalShareReaderViewIdList().forEach(id ->
-    outDtoList.add(new SetApprovalShareOutDto.Builder()
-                    .commandType(CommandType.CREATE)
-                    .approvalShareReaderId(id)
-                    .build()));
-
-여기서 stream을 쓰는 방법은?
-
-
-
-// Add all approvalShareReaderViewId from deleteOutDto
-List<SetApprovalShareOutDto> deleteOutDtoList = deleteOutDto.getApprovalShareReaderViewIdList().stream()
-        .map(id -> new SetApprovalShareOutDto.Builder()
-                .commandType(CommandType.DELETE)
-                .approvalShareReaderId(id)
-                .build())
-        .collect(Collectors.toList());
-
-// Add all approvalShareReaderViewId from createOutDto
-List<SetApprovalShareOutDto> createOutDtoList = createOutDto.getApprovalShareReaderViewIdList().stream()
-        .map(id -> new SetApprovalShareOutDto.Builder()
-                .commandType(CommandType.CREATE)
-                .approvalShareReaderId(id)
-                .build())
-        .collect(Collectors.toList());
-
-// Add all elements to outDtoList
-outDtoList.addAll(deleteOutDtoList);
-outDtoList.addAll(createOutDtoList);
