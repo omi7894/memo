@@ -1,3 +1,6 @@
-List<ApprovalShare> approvalShares = deleteList.stream()
-    .map(ApprovalShareReaderView::getApprovalShare)
-    .collect(Collectors.toList());
+for(ApprovalShareReaderView list : deleteList){
+            ApprovalShare approvalShare = list.getApprovalShare();
+            if(approvalShareReaderViewRepository.findByApprovalShare(approvalShare).isEmpty()){
+                approvalShareAggregate.deleteApprovalShare(approvalShare);
+            }
+        }
