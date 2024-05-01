@@ -93,6 +93,7 @@ public PageDto<MultiLanguageQueryOutDto> findMultiLanguageList(String companyCod
     int totalElements = keyList.size();
     int fromIndex = pageable.getPageNumber() * pageable.getPageSize();
     int toIndex = Math.min(fromIndex + pageable.getPageSize(), totalElements);
+int totalPages = (totalElements + pageSize - 1) / pageSize;
     
     List<MultiLanguageQueryOutDto> resultList = keyList.subList(fromIndex, toIndex).stream()
             .map(key -> MultiLanguageQueryOutDto.builder()
@@ -104,7 +105,7 @@ public PageDto<MultiLanguageQueryOutDto> findMultiLanguageList(String companyCod
             .collect(Collectors.toList());
 
     return PageDto.of(
-            (int) Math.ceil((double) totalElements / (double) pageable.getPageSize()), 
+            totalPages, 
             totalElements, 
             resultList);
 }
