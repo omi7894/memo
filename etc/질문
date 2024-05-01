@@ -65,3 +65,24 @@ public PageDto<MultiLanguageQueryOutDto> findMultiLanguageList(String companyCod
 
         return new PageDto<>(resultList, totalElements, page, size);
     }
+
+
+페이저블
+
+public PageDto<MultiLanguageQueryOutDto> findMultiLanguageList(String companyCode, List<String> keyList, Pageable pageable) {
+        int totalElements = keyList.size();
+        int fromIndex = pageable.getPageNumber() * pageable.getPageSize();
+        int toIndex = Math.min(fromIndex + pageable.getPageSize(), totalElements);
+        
+        List<MultiLanguageQueryOutDto> resultList = keyList.subList(fromIndex, toIndex).stream()
+                .map(key -> MultiLanguageQueryOutDto.builder()
+                        .companyCode(companyCode)
+                        .key(key)
+                        .valueKo(multiLanguage.getValue(key, Locale.KOREAN, companyCode))
+                        .valueEn(multiLanguage.getValue(key, Locale.ENGLISH, companyCode))
+                        .build())
+                .collect(Collectors.toList());
+
+        return new PageDto<>(resultList, totalElements, pageable.getPageNumber(), pageable.getPageSize());
+    }
+
