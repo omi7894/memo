@@ -86,3 +86,13 @@ public PageDto<MultiLanguageQueryOutDto> findMultiLanguageList(String companyCod
         return new PageDto<>(resultList, totalElements, pageable.getPageNumber(), pageable.getPageSize());
     }
 
+
+
+public static <T> PageDto<T> of(int totalPages, int totalCount, List<T> content) {
+        return PageDto.<T>builder()
+                .totalPages(totalPages)
+                .totalCount(totalCount)
+                .content(content)
+                .build();
+    }
+
