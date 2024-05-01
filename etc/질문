@@ -87,12 +87,24 @@ public PageDto<MultiLanguageQueryOutDto> findMultiLanguageList(String companyCod
     }
 
 
+----
 
-public static <T> PageDto<T> of(int totalPages, int totalCount, List<T> content) {
-        return PageDto.<T>builder()
-                .totalPages(totalPages)
-                .totalCount(totalCount)
-                .content(content)
-                .build();
-    }
+public PageDto<MultiLanguageQueryOutDto> findMultiLanguageList(String companyCode, List<String> keyList, Pageable pageable) {
+    int totalElements = keyList.size();
+    int fromIndex = pageable.getPageNumber() * pageable.getPageSize();
+    int toIndex = Math.min(fromIndex + pageable.getPageSize(), totalElements);
+    
+    List<MultiLanguageQueryOutDto> resultList = keyList.subList(fromIndex, toIndex).stream()
+            .map(key -> MultiLanguageQueryOutDto.builder()
+                    .companyCode(companyCode)
+                    .key(key)
+                    .valueKo(multiLanguage.getValue(key, Locale.KOREAN, companyCode))
+                    .valueEn(multiLanguage.getValue(key, Locale.ENGLISH, companyCode))
+                    .build())
+            .collect(Collectors.toList());
 
+    return PageDto.of(
+            (int) Math.ceil((double) totalElements / (double) pageable.getPageSize()), 
+            totalElements, 
+            resultList);
+}
