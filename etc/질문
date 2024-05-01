@@ -122,10 +122,10 @@ ko:
 여기서
 
 매개변수를 Locale locale, String companyCode 를 받았을때,
-use-yn 이 "Y"인 모든 값의 key와 value 를 List로 return 하는 함수를 추가해줘
+모든 한국어 Key값들을 List로 반환하는 함수를 추가해줘
 
 
-
+-----------------------------
 
 public List<Map<String, String>> getKoreanMessagesWithUseYn(Locale locale, String companyCode) {
         String languageCode = locale.getLanguage();
@@ -140,3 +140,43 @@ public List<Map<String, String>> getKoreanMessagesWithUseYn(Locale locale, Strin
                 })
                 .collect(Collectors.toList());
     }
+
+
+--------------------
+
+
+// 모든 가능한 메시지 키를 정의합니다. 이 코드를 실제 사용하는 프로젝트에 맞게 수정해야 합니다.
+    private static final List<String> MESSAGE_KEYS = Arrays.asList(
+            "PasswordLost_Job_GROUPWARE_DESC",
+            "msg_password_change_body",
+            "FormName_K101_IMMP",
+            "FormName_K101_SPF5",
+            "FormName_K101_SPF1",
+            "FormName_K101_SPF2"
+            // 추가적인 메시지 키들을 여기에 추가하세요
+    );
+
+    public List<Map<String, String>> getKoreanMessagesWithUseYn(Locale locale, String companyCode) {
+        String languageCode = locale.getLanguage();
+        
+        return MESSAGE_KEYS.stream()
+                .filter(key -> "Y".equals(env.getProperty(languageCode + "." + companyCode + "." + key + ".use-yn")))
+                .map(key -> Map.of("key", key, "value", env.getProperty(languageCode + "." + companyCode + "." + key + ".value")))
+                .collect(Collectors.toList());
+    }
+
+--------------------------
+
+
+public List<String> getPropertyNames() {
+        List<String> propertyNames = new ArrayList<>();
+        MutablePropertySources propertySources = ((org.springframework.core.env.AbstractEnvironment) env).getPropertySources();
+        for (PropertySource<?> propertySource : propertySources) {
+            for (String propertyName : propertySource.getPropertyNames()) {
+                propertyNames.add(propertyName);
+            }
+        }
+        return propertyNames;
+    }
+
+
