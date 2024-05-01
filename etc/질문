@@ -1,6 +1,89 @@
-for(ApprovalShareReaderView list : deleteList){
-            ApprovalShare approvalShare = list.getApprovalShare();
-            if(approvalShareReaderViewRepository.findByApprovalShare(approvalShare).isEmpty()){
-                approvalShareAggregate.deleteApprovalShare(approvalShare);
-            }
+package com.hae.approval.general.spring.config;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
+
+import java.util.Locale;
+
+/**
+ * Locale에 따른 다국어 코드 조회 클래스 </br>
+ * Locale이 KOREAN일 경우, 한국어 메시지를 반환하고, ENGLISH일 경우 영어 메시지를 반환</br>
+ * 다국어 코드 데이터는 소스코드 저장소의 multiLanguageXX-dev.yml에서 확인 가능</br>
+ * {@see https://gitlab.hmg-corp.io/p-23-1789-121_kpoc/spring-cloud-config.git}</br>
+ * </br>
+ * ex. H109 회사코드의 PasswordLost_Job_GROUPWARE_DESC    </br>
+ * en.H109.PasswordLost_Job_GROUPWARE_DESC.value (multiLanguageEn-dev.yml) -> getValue("PasswordLost_Job_GROUPWARE_DESC", Locale.ENGLISH, "H109") (MultiLanguage.java)</br>
+ *
+ * @author 민초현/엔터프라이즈IT개발팀
+ * @since 2024-04-21
+ */
+@Component
+@RefreshScope
+@RequiredArgsConstructor
+public class MultiLanguage {
+
+    private final Environment env;
+
+    /**
+     * @param key
+     * @return
+     *
+     * @see #getValue(String, Locale, String)
+     */
+    public String getValue(String key){
+        return getValue(key, "ORGROOT");
+    }
+
+    /**
+     * @param key
+     * @param companyCode
+     * @return
+     *
+     * @see #getValue(String, Locale, String)
+     */
+    public String getValue(String key, String companyCode){
+        return getValue(key, Locale.KOREAN, companyCode);
+    }
+
+    /**
+     * @param key
+     * @param locale
+     * @return
+     *
+     * @see #getValue(String, Locale, String)
+     */
+    public String getValue(String key, Locale locale){
+        return getValue(key, locale, "ORGROOT");
+    }
+
+    /**
+     * @param key 검색하려는 다국어 키
+     * @param locale 조회 결과 언어. 기본값 KOREAN
+     * @param companyCode 색하려는 다국어 키의 소속 회사 코드. 기본값 ORGROOT
+     * @return 검색하려는 다국어 값. 키가 부재하거나 미사용중이면 키를 반환
+     */
+    public String getValue(String key, Locale locale, String companyCode){
+
+        switch (locale.getLanguage()){
+            case "ko" :
+            case "en" :
+                return getValueLanguage(key, companyCode, locale.getLanguage());
+            default:
+                return key;
         }
+    }
+
+    private String getValueLanguage(String key, String companyCode, String languageCode) {
+
+        String value = languageCode + "." + companyCode + "." + key + ".value";
+        String useYn = languageCode + "." + companyCode + "." + key + ".use-yn";
+
+        if(env.containsProperty(value) && "Y".equals(env.getProperty(useYn, ""))) {
+            return env.getProperty(value);
+        }
+
+        return key;
+    }
+}
