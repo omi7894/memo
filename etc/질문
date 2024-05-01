@@ -30,3 +30,16 @@ public List<MultiLanguageQueryOutDto> findMultiLanguageList(String companyCode, 
 
 
 간단하게 바꿔줘
+
+
+
+public List<MultiLanguageQueryOutDto> findMultiLanguageList(String companyCode, List<String> keyList) {
+        return keyList.stream()
+                .map(key -> MultiLanguageQueryOutDto.builder()
+                        .companyCode(companyCode)
+                        .key(key)
+                        .valueKo(multiLanguage.getValue(key, Locale.KOREAN, companyCode))
+                        .valueEn(multiLanguage.getValue(key, Locale.ENGLISH, companyCode))
+                        .build())
+                .collect(Collectors.toList());
+    }
