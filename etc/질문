@@ -104,25 +104,17 @@ ko:
       value: "PASSWORD 가 초기화 되었습니다. 로그인 후 즉시 변경바랍니다.<br>- 초기 PASSWORD: A!#+사번<br>예\
         ) 사번 : 1234567 초기 PASSWORD : A!#1234567"
   K101:
-    FormName_K101_IMMP:
-      use-yn: "Y"
-      value: "사업계획"
-    FormName_K101_SPF5:
-      use-yn: "Y"
-      value: "자금관리(TR)"
-    FormName_K101_SPF1:
-      use-yn: "Y"
-      value: "전표결재"
-    FormName_K101_SPF2:
-      use-yn: "Y"
-      value: "채무관리(AP)"
+    FormName_K101_IMMP: "Y"
+    FormName_K101_SPF5: "Y"
+    FormName_K101_SPF1: "Y"
+    FormName_K101_SPF2: "Y"
+
 
 
 
 여기서
 
-매개변수를 Locale locale, String companyCode 를 받았을때,
-모든 한국어 Key값들을 List로 반환하는 함수를 추가해줘
+K101 하위에 있는 모든 key값을 가져오는 함수를 만들어줘
 
 
 -----------------------------
@@ -166,17 +158,5 @@ public List<Map<String, String>> getKoreanMessagesWithUseYn(Locale locale, Strin
     }
 
 --------------------------
-
-
-public List<String> getPropertyNames() {
-        List<String> propertyNames = new ArrayList<>();
-        MutablePropertySources propertySources = ((org.springframework.core.env.AbstractEnvironment) env).getPropertySources();
-        for (PropertySource<?> propertySource : propertySources) {
-            for (String propertyName : propertySource.getPropertyNames()) {
-                propertyNames.add(propertyName);
-            }
-        }
-        return propertyNames;
-    }
 
 
