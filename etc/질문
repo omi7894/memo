@@ -1,3 +1,5 @@
+이 코드는 Spring Cloud Config를 사용하여 .yml 파일에서 다국어 메시지를 가져오는 java 소스코드이고
+
 package com.hae.approval.general.spring.config;
 
 import lombok.RequiredArgsConstructor;
@@ -89,6 +91,7 @@ public class MultiLanguage {
 }
 
 
+이건 yml파일 구조야
 
 ko:
   H109:
@@ -114,3 +117,26 @@ ko:
       use-yn: "Y"
       value: "채무관리(AP)"
 
+
+
+여기서
+
+매개변수를 Locale locale, String companyCode 를 받았을때,
+use-yn 이 "Y"인 모든 값의 key와 value 를 List로 return 하는 함수를 추가해줘
+
+
+
+
+public List<Map<String, String>> getKoreanMessagesWithUseYn(Locale locale, String companyCode) {
+        String languageCode = locale.getLanguage();
+        
+        return env.getPropertyNames().stream()
+                .filter(property -> languageCode.equals("ko") && property.endsWith(".use-yn"))
+                .filter(property -> "Y".equals(env.getProperty(property)))
+                .map(property -> {
+                    String key = property.substring(3, property.lastIndexOf("."));
+                    String value = env.getProperty("ko." + companyCode + "." + key + ".value");
+                    return Map.of("key", key, "value", value);
+                })
+                .collect(Collectors.toList());
+    }
