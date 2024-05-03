@@ -1,111 +1,27 @@
-public List<Map<String, String>> getMulitLanguageList(Locale locale, String companyCode) {
-        String languageCode = locale.getLanguage();
+public List<MultiLanguageCreateCommandOutDto> createMultiLanguage(List<MultiLanguageCreateCommandInDto> inDtoList){
+        // 엔티티 생성
+        List<MultiLanguageProperty> list = new ArrayList<>();
+        List<MultiLanguageCreateCommandOutDto> dtoList = new ArrayList<>();
 
-        return MESSAGE_KEYS.stream()
-                .filter(key -> "Y".equals(env.getProperty(languageCode + "." + companyCode + "." + key + ".use-yn")))
-                .map(key -> Map.of("key", key
-                        , "ko", getValueLanguage(key, companyCode, "ko")
-                ))
-                .collect(Collectors.toList());
-    }
+        for(MultiLanguageCreateCommandInDto inDto : inDtoList){
+            if(!(inDto.getValueKo().isEmpty() && inDto.getValueEn().isEmpty())){
+                list.add(multiLanguagePropertyMapper.toMultiLanguagePropertyKo(inDto));
+                list.add(multiLanguagePropertyMapper.toMultiLanguagePropertyEn(inDto));
 
-return 형식을 HashMap으로 바꿔서 "en"까지 추가해서 List로 가져오도록 해줘
-
-
-
-
-public List<MultiLanguageQueryOutDto> findMultiLanguageList(String companyCode, List<String> keyList) {
-        List<MultiLanguageQueryOutDto> resultList = new ArrayList<>();
-        for(String key : keyList){
-            MultiLanguageQueryOutDto result = MultiLanguageQueryOutDto.builder()
-                    .companyCode(companyCode)
-                    .key(key)
-                    .valueKo(multiLanguage.getValue(key, Locale.KOREAN, companyCode ))
-                    .valueEn(multiLanguage.getValue(key, Locale.ENGLISH, companyCode))
-                    .build();
-            resultList.add(result);
+                MultiLanguageCreateCommandOutDto outDto = MultiLanguageCreateCommandOutDto.builder()
+                        .companyCode(inDto.getCompanyCode())
+                        .groupCode(inDto.getGroupCode())
+                        .key(inDto.getKey())
+                        .valueKo(inDto.getValueKo())
+                        .valueEn(inDto.getValueEn())
+                        .build();
+                dtoList.add(outDto);
+            }
         }
-        return resultList;
+
+        // 일괄 저장
+        multiLanguagePropertyRepository.saveAll(list);
+        return dtoList;
     }
 
-
-간단하게 바꿔줘
-
-
-
-public List<MultiLanguageQueryOutDto> findMultiLanguageList(String companyCode, List<String> keyList) {
-        return keyList.stream()
-                .map(key -> MultiLanguageQueryOutDto.builder()
-                        .companyCode(companyCode)
-                        .key(key)
-                        .valueKo(multiLanguage.getValue(key, Locale.KOREAN, companyCode))
-                        .valueEn(multiLanguage.getValue(key, Locale.ENGLISH, companyCode))
-                        .build())
-                .collect(Collectors.toList());
-    }
-
-
-------
-
-페이징
-
-public PageDto<MultiLanguageQueryOutDto> findMultiLanguageList(String companyCode, List<String> keyList, int page, int size) {
-        int totalElements = keyList.size();
-        int fromIndex = Math.min(page * size, totalElements);
-        int toIndex = Math.min(fromIndex + size, totalElements);
-        
-        List<MultiLanguageQueryOutDto> resultList = keyList.subList(fromIndex, toIndex).stream()
-                .map(key -> MultiLanguageQueryOutDto.builder()
-                        .companyCode(companyCode)
-                        .key(key)
-                        .valueKo(multiLanguage.getValue(key, Locale.KOREAN, companyCode))
-                        .valueEn(multiLanguage.getValue(key, Locale.ENGLISH, companyCode))
-                        .build())
-                .collect(Collectors.toList());
-
-        return new PageDto<>(resultList, totalElements, page, size);
-    }
-
-
-페이저블
-
-public PageDto<MultiLanguageQueryOutDto> findMultiLanguageList(String companyCode, List<String> keyList, Pageable pageable) {
-        int totalElements = keyList.size();
-        int fromIndex = pageable.getPageNumber() * pageable.getPageSize();
-        int toIndex = Math.min(fromIndex + pageable.getPageSize(), totalElements);
-        
-        List<MultiLanguageQueryOutDto> resultList = keyList.subList(fromIndex, toIndex).stream()
-                .map(key -> MultiLanguageQueryOutDto.builder()
-                        .companyCode(companyCode)
-                        .key(key)
-                        .valueKo(multiLanguage.getValue(key, Locale.KOREAN, companyCode))
-                        .valueEn(multiLanguage.getValue(key, Locale.ENGLISH, companyCode))
-                        .build())
-                .collect(Collectors.toList());
-
-        return new PageDto<>(resultList, totalElements, pageable.getPageNumber(), pageable.getPageSize());
-    }
-
-
-----
-
-public PageDto<MultiLanguageQueryOutDto> findMultiLanguageList(String companyCode, List<String> keyList, Pageable pageable) {
-    int totalElements = keyList.size();
-    int fromIndex = pageable.getPageNumber() * pageable.getPageSize();
-    int toIndex = Math.min(fromIndex + pageable.getPageSize(), totalElements);
-int totalPages = (totalElements + pageSize - 1) / pageSize;
-    
-    List<MultiLanguageQueryOutDto> resultList = keyList.subList(fromIndex, toIndex).stream()
-            .map(key -> MultiLanguageQueryOutDto.builder()
-                    .companyCode(companyCode)
-                    .key(key)
-                    .valueKo(multiLanguage.getValue(key, Locale.KOREAN, companyCode))
-                    .valueEn(multiLanguage.getValue(key, Locale.ENGLISH, companyCode))
-                    .build())
-            .collect(Collectors.toList());
-
-    return PageDto.of(
-            totalPages, 
-            totalElements, 
-            resultList);
-}
+이 코드를 더 간단하게 해줘
