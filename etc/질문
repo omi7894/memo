@@ -1,3 +1,15 @@
+public List<MultiLanguageCreateCommandOutDto> createMultiLanguage(List<MultiLanguageCreateCommandInDto> inDtoList) {
+        // 중복 확인
+        List<MultiLanguagePropertyId> multiLanguagePropertyIdList = multiLanguagePropertyMapper.toMultiLanguagePropertyIdList(inDtoList);
+        if(!multiLanguagePropertyRepository.findByIdList(multiLanguagePropertyIdList).isEmpty()){
+            throw new DuplicateException(MultiLanguagePropertyId.class.getName());
+        }
+
+        return multiLanguageAggregate.createMultiLanguage(inDtoList);
+    }
+
+더 간단하게 바꿔줘
+
 public List<MultiLanguageCreateCommandOutDto> createMultiLanguage(List<MultiLanguageCreateCommandInDto> inDtoList){
         // 엔티티 생성
         List<MultiLanguageProperty> list = new ArrayList<>();
@@ -24,4 +36,49 @@ public List<MultiLanguageCreateCommandOutDto> createMultiLanguage(List<MultiLang
         return dtoList;
     }
 
-이 코드를 더 간단하게 해줘
+
+더 간단하게 바꿔줘
+
+
+@Mapper
+public interface MultiLanguagePropertyMapper {
+    MultiLanguagePropertyMapper INSTANCE = Mappers.getMapper(MultiLanguagePropertyMapper.class);
+
+    @Named("toMultiLanguagePropertyId")
+    default MultiLanguagePropertyId toMultiLanguagePropertyId(MultiLanguageCreateCommandInDto inDto){
+        return MultiLanguagePropertyId.builder()
+                .profile(inDto.getProfile())
+                .label(inDto.getLabel())
+                .languageCode(Locale.KOREAN.getLanguage())
+                .companyCode(inDto.getCompanyCode())
+                .propertyGroupCode(inDto.getGroupCode())
+                .key(inDto.getKey())
+                .build();
+    }
+    @IterableMapping(qualifiedByName = "toMultiLanguagePropertyId")
+    List<MultiLanguagePropertyId> toMultiLanguagePropertyIdList(List<MultiLanguageCreateCommandInDto> inDtoList);
+
+    default MultiLanguageProperty toMultiLanguagePropertyKo (MultiLanguageCreateCommandInDto inDto){
+        return MultiLanguageProperty.builder()
+                .multiLanguagePropertyId(new MultiLanguagePropertyId(inDto.getProfile(), inDto.getLabel(), Locale.KOREAN.getLanguage(),
+                        inDto.getCompanyCode(), inDto.getGroupCode(), inDto.getKey()))
+                .value(inDto.getValueKo())
+                .description(inDto.getDescription())
+                .useYn(YesNo.Y)
+                .build();
+    }
+
+    default MultiLanguageProperty toMultiLanguagePropertyEn (MultiLanguageCreateCommandInDto inDto){
+        return MultiLanguageProperty.builder()
+                .multiLanguagePropertyId(new MultiLanguagePropertyId(inDto.getProfile(), inDto.getLabel(), Locale.ENGLISH.getLanguage(),
+                        inDto.getCompanyCode(), inDto.getGroupCode(), inDto.getKey()))
+                .value(inDto.getValueEn())
+                .description(inDto.getDescription())
+                .useYn(YesNo.Y)
+                .build();
+    }
+
+}
+
+
+더 간단하게 바꿔줘
