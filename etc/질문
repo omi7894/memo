@@ -3,3 +3,8 @@ List<String> approvalShareReaderViewIdList = new ArrayList<>();
             approvalShareReaderViewIdList.add(referenceDisplayDto.getReaderId());
         }
 
+간단하게 바꿔줘
+
+List<String> approvalShareReaderViewIdList = referenceInfo.stream()
+    .map(ReferenceDisplayDto::getReaderId)
+    .collect(Collectors.toList());
