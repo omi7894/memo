@@ -1,10 +1,94 @@
-List<String> approvalShareReaderViewIdList = new ArrayList<>();
-        for(ReferenceDisplayDto referenceDisplayDto : referenceInfo){
-            approvalShareReaderViewIdList.add(referenceDisplayDto.getReaderId());
-        }
+public interface ConfigurationClient extends BaseClient {
+    @PostMapping(value = "/email/send")
+    void sendEmail(@RequestBody EmailMessage emailMessage);
+}
 
-간단하게 바꿔줘
+public class EmailMessage {
+    private List<Person> receiverList;
+    private Person sender;
+    private String formName;
+    private String subject;
+    private String linkUrl;
+    private  List<EmailBodyContext> bodyContextList;
+}
 
-List<String> approvalShareReaderViewIdList = referenceInfo.stream()
-    .map(ReferenceDisplayDto::getReaderId)
-    .collect(Collectors.toList());
+public class Person {
+    private String name;
+    private String nameEn;
+    private String deptName;
+    private String deptNameEn;
+    private String email;
+    private Locale locale;
+}
+
+public class IctExecutionCustomRepositoryImpl implements IctExecutionCustomRepository {
+    private final DSLContext dsl;
+    @Override
+    public List<ictExecutionQueryOutDto> findIctExecutionList() {
+        Condition condition = DSL.noCondition();
+
+        return dsl.select(
+                        DOCUMENT_.DOCUMENT_ID,
+                        DOCUMENT_.APPROVAL_LINE_ID,
+                        DOCUMENT_.DOCUMENT_TITLE,
+                        DOCUMENT_.SUBMITTER_ID,
+                        DOCUMENT_.SUBMITTER_NAME,
+                        DOCUMENT_.SUBMITTER_NAME_EN,
+                        DOCUMENT_.SUBMITTER_DEPARTMENT_CODE,
+                        DOCUMENT_.SUBMITTER_DEPARTMENT_NAME,
+                        DOCUMENT_.SUBMITTER_DEPARTMENT_NAME_EN,
+                        DOCUMENT_.SUBMIT_DATETIME
+                )
+                .from(DOCUMENT_)
+                .where(DOCUMENT_.FORM_CODE.in("GWOK_INVEST_W01","GWOK_PINVEST_W02"))
+                .fetchInto(ictExecutionQueryOutDto.class);
+    }
+}
+
+
+
+일때,
+private final ConfigurationClient configurationClient;
+
+    public static final String JOB_NAME = "investConsultationIctExecution";
+
+    @Bean(JOB_NAME)
+    public Job job() {
+        return jobBuilderFactory.get(JOB_NAME)
+                .preventRestart()
+                .start(step())
+                .build();
+    }
+
+    @Bean(JOB_NAME + "Step")
+    @JobScope
+    public Step step() {
+        return stepBuilderFactory.get(JOB_NAME + "Step")
+                .chunk(1000)
+                .reader(reader())
+                //.processor(processor())
+                //.writer(writer())
+                .faultTolerant()
+                .retry(Exception.class)
+                .retryLimit(BatchConstants.RETRY_LIMIT)
+                .skip(Exception.class)
+                .skipLimit(BatchConstants.SKIP_LIMIT)
+                .listener(listener())
+                .build();
+    }
+
+    private ItemReader<ictExecutionQueryOutDto> reader(){
+        return new ListItemReader<>(
+                ictExecutionCustomRepository.findIctExecutionList()
+        );
+    }
+
+    private ItemProcessor<ictExecutionQueryOutDto, EmailMessage> processor() {
+
+    }
+
+    private ItemWriter<EmailMessage> writer() {
+
+    }
+
+여기에 processor() 과 writer() 코드를 짜줘
