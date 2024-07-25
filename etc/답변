@@ -1,0 +1,33 @@
+private ItemProcessor<ictExecutionQueryOutDto, EmailMessage> processor() {
+        return item -> {
+            EmailMessage emailMessage = new EmailMessage();
+            Person sender = new Person();
+            sender.setName("System Admin");
+            sender.setEmail("no-reply@example.com");
+
+            Person receiver = new Person();
+            receiver.setName(item.getSubmitterName());
+            receiver.setNameEn(item.getSubmitterNameEn());
+            receiver.setDeptName(item.getSubmitterDepartmentName());
+            receiver.setDeptNameEn(item.getSubmitterDepartmentNameEn());
+            receiver.setEmail(item.getSubmitterEmail());
+
+            emailMessage.setSender(sender);
+            emailMessage.setReceiverList(Collections.singletonList(receiver));
+            emailMessage.setSubject("Your ICT Execution Report");
+            emailMessage.setFormName("ICT Execution Form");
+            emailMessage.setLinkUrl("http://example.com/details/" + item.getDocumentId());
+
+            EmailBodyContext context = new EmailBodyContext();
+            context.setKey("documentTitle");
+            context.setValue(item.getDocumentTitle());
+
+            emailMessage.setBodyContextList(Collections.singletonList(context));
+
+            return emailMessage;
+        };
+    }
+
+    private ItemWriter<EmailMessage> writer() {
+        return items -> items.forEach(configurationClient::sendEmail);
+    }
