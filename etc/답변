@@ -53,3 +53,23 @@ private ItemProcessor<ictExecutionQueryOutDto, EmailMessage> processor() {
                 )
                 .orderBy(WF_FORM_INSTANCE.INITIATED_DATE.desc())
                 .fetchInto(ictExecutionQueryOutDto.class);
+
+----
+
+SELECT 절
+DOC_NO: 문서 번호를 선택합니다.
+SUBJECT: 문서의 주제를 선택합니다.
+SENDNAME: 송신자의 이름을 선택합니다.
+SENDDEPT: 송신자의 부서를 선택합니다.
+CONVERT(NVARCHAR(16), DATEADD(hh, 9, INITIATED_DATE), 120) AS CREATEDATE:
+INITIATED_DATE에 9시간을 더한 후, 이를 NVARCHAR(16) 형식으로 변환하고, 이를 CREATEDATE라는 별칭으로 선택합니다.
+PROCESS_INSTANCE_ID: 프로세스 인스턴스 ID를 선택합니다.
+FROM 절
+WF_FORM_INSTANCE: 데이터가 선택될 테이블입니다.
+WHERE 절
+FORM_PREFIX = 'GWOK_WORKINGBUDGET_W01': FORM_PREFIX가 'GWOK_WORKINGBUDGET_W01'인 행만 선택합니다.
+STATUS_CODE NOT IN ('TEMPSAVE', 'REJECT'): STATUS_CODE가 'TEMPSAVE'나 'REJECT'가 아닌 행만 선택합니다.
+CONVERT(VARCHAR(10), DATEADD(hh, 9, INITIATED_DATE), 121) = CONVERT(VARCHAR(10), DATEADD(DAY, -1, GETDATE()), 121):
+INITIATED_DATE에 9시간을 더한 날짜가 현재 날짜의 전날과 같은 행만 선택합니다. 여기서 날짜 비교는 'YYYY-MM-DD' 형식으로 이루어집니다.
+SUBSTRING(BODY_CONTEXT, CHARINDEX('<ICT_EXECUTION>', BODY_CONTEXT) + 15, 1) = '1':
+BODY_CONTEXT 필드에서 '<ICT_EXECUTION>' 문자열의 위치를 찾아서, 그 위치에서 15자 뒤의 한 문자가 '1'인 행만 선택합니다.
