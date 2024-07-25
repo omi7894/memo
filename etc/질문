@@ -92,3 +92,63 @@ private final ConfigurationClient configurationClient;
     }
 
 여기에 processor() 과 writer() 코드를 짜줘
+
+
+------------------
+
+SELECT 
+
+		DOC_NO  
+
+		, SUBJECT  
+
+		, COVI_SMART.dbo.Fn_ComSplit_Lang(INITIATOR_NAME, ';', 'ko-KR') AS SENDNAME
+		
+		, COVI_SMART.dbo.Fn_ComSplit_Lang(INITIATOR_OU_NAME, ';', 'ko-KR') AS SENDDEPT  
+
+		, CONVERT(NVARCHAR(16), DATEADD(hh,9,INITIATED_DATE) , 120)  AS CREATEDATE  
+
+		, PROCESS_INSTANCE_ID AS PROCESS_INSTANCE_ID
+  
+     FROM [COVI_FLOW_FORM_DEF].[dbo].[WF_FORM_INSTANCE] with(nolock)  
+
+     WHERE FORM_PREFIX = 'GWOK_WORKINGBUDGET_W01'
+
+		AND STATUS_CODE NOT IN ('TEMPSAVE', 'REJECT')  
+
+		AND CONVERT(VARCHAR(10), DATEADD(hh,9,INITIATED_DATE) , 121) = CONVERT(VARCHAR(10), DATEADD(DAY, -1, GETDATE()),121)
+
+		AND SUBSTRING(BODY_CONTEXT,CHARINDEX('<ICT_EXECUTION>',BODY_CONTEXT) +15 ,1) = '1'
+
+  ORDER BY INITIATED_DATE DESC  
+
+이 쿼리를 
+
+public class IctExecutionCustomRepositoryImpl implements IctExecutionCustomRepository {
+    private final DSLContext dsl;
+    @Override
+    public List<ictExecutionQueryOutDto> findIctExecutionList() {
+        Condition condition = DSL.noCondition();
+
+        return dsl.select(
+                        DOCUMENT_.DOCUMENT_ID,
+                        DOCUMENT_.APPROVAL_LINE_ID,
+                        DOCUMENT_.DOCUMENT_TITLE,
+                        DOCUMENT_.SUBMITTER_ID,
+                        DOCUMENT_.SUBMITTER_NAME,
+                        DOCUMENT_.SUBMITTER_NAME_EN,
+                        DOCUMENT_.SUBMITTER_DEPARTMENT_CODE,
+                        DOCUMENT_.SUBMITTER_DEPARTMENT_NAME,
+                        DOCUMENT_.SUBMITTER_DEPARTMENT_NAME_EN,
+                        DOCUMENT_.SUBMIT_DATETIME
+                )
+                .from(DOCUMENT_)
+                .where(DOCUMENT_.FORM_CODE.in("GWOK_INVEST_W01","GWOK_PINVEST_W02"))
+                .fetchInto(ictExecutionQueryOutDto.class);
+    }
+}
+
+이런 jooq로 만들어줘
+
+
+
