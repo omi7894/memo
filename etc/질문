@@ -102,15 +102,15 @@ SELECT
 
 		, SUBJECT  
 
-		, COVI_SMART.dbo.Fn_ComSplit_Lang(INITIATOR_NAME, ';', 'ko-KR') AS SENDNAME
+		, SENDNAME
 		
-		, COVI_SMART.dbo.Fn_ComSplit_Lang(INITIATOR_OU_NAME, ';', 'ko-KR') AS SENDDEPT  
+		, SENDDEPT  
 
 		, CONVERT(NVARCHAR(16), DATEADD(hh,9,INITIATED_DATE) , 120)  AS CREATEDATE  
 
-		, PROCESS_INSTANCE_ID AS PROCESS_INSTANCE_ID
+		, PROCESS_INSTANCE_ID
   
-     FROM [COVI_FLOW_FORM_DEF].[dbo].[WF_FORM_INSTANCE] with(nolock)  
+     FROM WF_FORM_INSTANCE
 
      WHERE FORM_PREFIX = 'GWOK_WORKINGBUDGET_W01'
 
@@ -122,7 +122,7 @@ SELECT
 
   ORDER BY INITIATED_DATE DESC  
 
-이 쿼리를 
+이 Mysql 쿼리를 
 
 public class IctExecutionCustomRepositoryImpl implements IctExecutionCustomRepository {
     private final DSLContext dsl;
@@ -148,7 +148,7 @@ public class IctExecutionCustomRepositoryImpl implements IctExecutionCustomRepos
     }
 }
 
-이런 jooq로 만들어줘
+이러한 java jooq로 만들어줘
 
 
 
