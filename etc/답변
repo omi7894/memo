@@ -31,3 +31,25 @@ private ItemProcessor<ictExecutionQueryOutDto, EmailMessage> processor() {
     private ItemWriter<EmailMessage> writer() {
         return items -> items.forEach(configurationClient::sendEmail);
     }
+
+
+---
+
+
+       return dsl.select(
+                        WF_FORM_INSTANCE.DOC_NO,
+                        WF_FORM_INSTANCE.SUBJECT,
+                        WF_FORM_INSTANCE.SENDNAME,
+                        WF_FORM_INSTANCE.SENDDEPT,
+                        field("CONVERT(NVARCHAR(16), DATE_ADD({0}, INTERVAL 9 HOUR), 120)", String.class, WF_FORM_INSTANCE.INITIATED_DATE).as("CREATEDATE"),
+                        WF_FORM_INSTANCE.PROCESS_INSTANCE_ID
+                )
+                .from(WF_FORM_INSTANCE)
+                .where(WF_FORM_INSTANCE.FORM_PREFIX.eq("GWOK_WORKINGBUDGET_W01")
+                        .and(WF_FORM_INSTANCE.STATUS_CODE.notIn("TEMPSAVE", "REJECT"))
+                        .and(field("CONVERT(VARCHAR(10), DATE_ADD({0}, INTERVAL 9 HOUR), 121)", String.class, WF_FORM_INSTANCE.INITIATED_DATE)
+                                .eq(field("CONVERT(VARCHAR(10), DATE_ADD(CURRENT_DATE, INTERVAL -1 DAY), 121)", String.class)))
+                        .and(field("SUBSTRING({0}, LOCATE('<ICT_EXECUTION>', {0}) + 15, 1)", String.class, WF_FORM_INSTANCE.BODY_CONTEXT).eq("1"))
+                )
+                .orderBy(WF_FORM_INSTANCE.INITIATED_DATE.desc())
+                .fetchInto(ictExecutionQueryOutDto.class);
